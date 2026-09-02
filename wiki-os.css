@@ -1,0 +1,261 @@
+/* ==========================================================================
+   КОДЕКС ПАНДЕМОНИУМ // PANDEMONIUM OS
+   Ретро-ОС в духе GEM / раннего Mac: моно-зелёный рабочий стол, окна, папки.
+   Вид ретро — управление современное (клик открывает, окно закрыл → стол).
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=swap');
+
+:root {
+  --desk:    #8ba57e;   /* зелень рабочего стола */
+  --desk-2:  #7f9a72;   /* дизеринг */
+  --win:     #e9efe2;   /* «бумага» окна */
+  --ink:     #16241a;   /* почти чёрный (зеленоватый) */
+  --line:    #16241a;   /* границы */
+  --sel:     #16241a;   /* выделение (инверсия) */
+  --sel-tx:  #e9efe2;
+  --shadow:  rgba(10,20,12,.4);
+
+  --menu-h: 26px;
+  --font-ui:   'Silkscreen', 'Courier New', monospace;   /* меню, заголовки, иконки */
+  --font-body: 'VT323', 'Courier New', monospace;         /* текст статей */
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--desk);
+  background-image:
+    linear-gradient(45deg, var(--desk-2) 25%, transparent 25%, transparent 75%, var(--desk-2) 75%),
+    linear-gradient(45deg, var(--desk-2) 25%, transparent 25%, transparent 75%, var(--desk-2) 75%);
+  background-size: 4px 4px;
+  background-position: 0 0, 2px 2px;
+  overflow: hidden;
+  -webkit-font-smoothing: none;
+  image-rendering: pixelated;
+  user-select: none;
+}
+
+/* ---- МЕНЮ-БАР ------------------------------------------------------------ */
+.menubar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9000;
+  height: var(--menu-h);
+  display: flex; align-items: stretch;
+  background: var(--win);
+  border-bottom: 2px solid var(--line);
+  font-family: var(--font-ui); font-size: 12px;
+}
+.menubar .mb-brand {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 12px 0 10px; font-weight: 700;
+  border-right: 2px solid var(--line);
+}
+.menubar .mb-brand .diamond { font-size: 12px; }
+.mb-item {
+  display: flex; align-items: center; padding: 0 12px;
+  cursor: pointer; position: relative; white-space: nowrap;
+}
+.mb-item:hover, .mb-item.open { background: var(--sel); color: var(--sel-tx); }
+.mb-clock {
+  margin-left: auto; display: flex; align-items: center;
+  padding: 0 12px; border-left: 2px solid var(--line); font-size: 12px;
+}
+
+/* выпадающее меню */
+.mb-drop {
+  position: absolute; top: 100%; left: -2px; min-width: 190px;
+  background: var(--win); border: 2px solid var(--line);
+  box-shadow: 3px 3px 0 var(--shadow);
+  display: none; padding: 3px 0; z-index: 9500;
+}
+.mb-item.open .mb-drop { display: block; }
+.mb-row {
+  padding: 4px 16px; cursor: pointer; color: var(--ink);
+  display: flex; justify-content: space-between; gap: 18px;
+}
+.mb-row:hover { background: var(--sel); color: var(--sel-tx); }
+.mb-row.disabled { color: #8a9a86; pointer-events: none; }
+.mb-sep { height: 2px; background: var(--line); margin: 3px 0; }
+
+/* ---- РАБОЧИЙ СТОЛ -------------------------------------------------------- */
+.desktop {
+  position: fixed; top: var(--menu-h); left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+}
+.icons {
+  position: absolute; top: 14px; left: 14px;
+  display: flex; flex-direction: column; flex-wrap: wrap;
+  align-content: flex-start; gap: 6px 0; max-height: calc(100% - 28px);
+}
+.dicon {
+  width: 92px; padding: 8px 4px 6px; margin: 0 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  cursor: pointer; text-align: center;
+  font-family: var(--font-ui); font-size: 10px; line-height: 1.35;
+  color: var(--ink);
+}
+.dicon .glyph { width: 42px; height: 34px; display: grid; place-items: center; }
+.dicon .glyph svg { width: 40px; height: 34px; }
+.dicon .label { padding: 1px 4px; border: 2px solid transparent; word-break: break-word; }
+.dicon:hover .label { text-decoration: underline; }
+.dicon.selected .glyph svg { filter: none; }
+.dicon.selected .label { background: var(--sel); color: var(--sel-tx); border-color: var(--sel); }
+.dicon.trash { position: absolute; bottom: 8px; }
+
+/* ---- ОКНА ---------------------------------------------------------------- */
+.win {
+  position: absolute; min-width: 240px;
+  background: var(--win);
+  border: 2px solid var(--line);
+  box-shadow: 3px 3px 0 var(--shadow);
+  display: flex; flex-direction: column;
+  max-width: calc(100vw - 20px); max-height: calc(100vh - var(--menu-h) - 20px);
+}
+.win-title {
+  display: flex; align-items: center; height: 22px;
+  border-bottom: 2px solid var(--line);
+  font-family: var(--font-ui); font-size: 11px;
+  cursor: default; position: relative;
+  background: var(--win);
+}
+/* активное окно — «полосатый» титул */
+.win.active .win-title {
+  background:
+    repeating-linear-gradient(var(--ink) 0 2px, transparent 2px 4px);
+}
+.win-close {
+  width: 22px; height: 100%; flex: 0 0 22px;
+  border-right: 2px solid var(--line);
+  background: var(--win);
+  display: grid; place-items: center; cursor: pointer; font-size: 12px;
+}
+.win-close:hover { background: var(--sel); color: var(--sel-tx); }
+.win-name {
+  flex: 1 1 auto; text-align: center; padding: 0 10px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.win.active .win-name {
+  background: var(--win); margin: 0 8px; padding: 0 10px;
+}
+.win-sub {
+  flex: 0 0 auto; height: 100%; display: flex; align-items: center;
+  padding: 0 10px; border-left: 2px solid var(--line);
+  font-family: var(--font-ui); font-size: 10px; background: var(--win);
+}
+.win-body { overflow: auto; flex: 1 1 auto; background: var(--win); }
+
+/* ---- ОКНО-ПАПКА (список файлов) ----------------------------------------- */
+.filelist { padding: 4px; font-family: var(--font-ui); font-size: 11px; }
+.filerow {
+  display: flex; align-items: center; gap: 9px;
+  padding: 6px 8px; cursor: pointer; border: 2px solid transparent;
+}
+.filerow:hover { background: var(--sel); color: var(--sel-tx); }
+.filerow:hover svg { color: var(--sel-tx); }
+.filerow .fr-ic { width: 20px; height: 18px; flex: 0 0 20px; }
+.filerow .fr-ic svg { width: 20px; height: 18px; }
+.filerow .fr-name { flex: 1 1 auto; }
+.filerow .fr-tag { font-size: 9px; opacity: .8; }
+.empty-note { padding: 22px; text-align: center; font-family: var(--font-ui); font-size: 11px; }
+
+/* ---- ОКНО-СТАТЬЯ --------------------------------------------------------- */
+.article { padding: 14px 18px 22px; font-family: var(--font-body); }
+.article .a-title {
+  font-family: var(--font-ui); font-size: 17px; font-weight: 700;
+  margin: 0 0 2px; line-height: 1.2;
+}
+.article .a-aka {
+  font-size: 17px; color: #4b5b4c; margin-bottom: 10px;
+  border-bottom: 2px solid var(--line); padding-bottom: 8px;
+}
+.article .a-body { font-size: 20px; line-height: 1.42; }
+.article .a-body p { margin: 0 0 .7em; max-width: 40ch; }
+.article .a-body .lead { }
+.article .a-body h2 {
+  font-family: var(--font-ui); font-size: 13px; font-weight: 700;
+  margin: 1.1em 0 .4em; padding-bottom: 5px;
+  border-bottom: 2px dotted var(--line); max-width: 42ch;
+}
+.article .a-body em { color: #4b5b4c; font-style: normal; text-decoration: underline dotted; }
+.article a { color: var(--ink); font-weight: 700; text-decoration: underline; cursor: pointer; }
+.article a:hover { background: var(--sel); color: var(--sel-tx); text-decoration: none; }
+
+/* инфобокс */
+.infobox {
+  float: right; width: 200px; margin: 2px 0 12px 16px;
+  border: 2px solid var(--line); background: var(--win);
+  font-family: var(--font-ui); font-size: 10px;
+}
+.ib-head {
+  display: flex; align-items: center; gap: 8px; padding: 7px 9px;
+  border-bottom: 2px solid var(--line);
+  background: repeating-linear-gradient(var(--ink) 0 2px, transparent 2px 4px);
+}
+.ib-emblem {
+  width: 26px; height: 26px; flex: 0 0 26px; display: grid; place-items: center;
+  background: var(--win); border: 2px solid var(--line);
+  font-family: var(--font-body); font-size: 18px;
+}
+.ib-title { background: var(--win); padding: 2px 6px; font-size: 11px; }
+.ib-caption { padding: 5px 9px; border-bottom: 2px solid var(--line); font-size: 9px; }
+.ib-table { width: 100%; border-collapse: collapse; }
+.ib-table tr { border-bottom: 2px dotted var(--line); }
+.ib-table tr:last-child { border-bottom: none; }
+.ib-table th { text-align: left; vertical-align: top; padding: 5px 6px 5px 9px; width: 46%; color: #3f4f40; font-weight: 400; }
+.ib-table td { padding: 5px 9px 5px 4px; vertical-align: top; font-family: var(--font-body); font-size: 14px; }
+.ib-table td a { font-family: var(--font-body); }
+
+.stub-note {
+  border: 2px solid var(--line); padding: 7px 10px; margin-bottom: 12px;
+  font-family: var(--font-ui); font-size: 10px; line-height: 1.5;
+  background: repeating-linear-gradient(135deg, transparent 0 6px, rgba(22,36,26,.06) 6px 12px);
+}
+
+.a-cats { clear: both; margin-top: 1.4em; padding-top: 9px; border-top: 2px solid var(--line); font-family: var(--font-ui); font-size: 10px; }
+.a-cats .lab { color: #4b5b4c; margin-right: 4px; }
+.cat-chip { display: inline-block; border: 2px solid var(--line); padding: 2px 8px; margin: 2px; text-decoration: none !important; font-weight: 400 !important; }
+.cat-chip:hover { background: var(--sel); color: var(--sel-tx); }
+
+.see-also { clear: both; margin-top: 1.2em; }
+.see-also h2 { font-family: var(--font-ui); font-size: 12px; border-bottom: 2px dotted var(--line); padding-bottom: 4px; }
+.see-also ul { list-style: none; padding: 0; margin: .4em 0 0; font-size: 18px; }
+.see-also li { margin: 2px 0; }
+.see-also li::before { content: '▸ '; }
+
+/* ---- ПОИСК --------------------------------------------------------------- */
+.search-box { padding: 10px; border-bottom: 2px solid var(--line); display: flex; gap: 8px; align-items: center; font-family: var(--font-ui); font-size: 11px; }
+.search-box input {
+  flex: 1 1 auto; font-family: var(--font-body); font-size: 20px;
+  padding: 3px 8px; border: 2px solid var(--line); background: var(--win); color: var(--ink);
+  outline: none;
+}
+.search-hint { padding: 18px; font-family: var(--font-ui); font-size: 11px; text-align: center; color: #4b5b4c; }
+
+/* ---- РЕТРО-СКРОЛЛБАРЫ ---------------------------------------------------- */
+.win-body { scrollbar-width: thin; scrollbar-color: var(--ink) var(--win); }
+.win-body::-webkit-scrollbar { width: 15px; height: 15px; }
+.win-body::-webkit-scrollbar-track { background: var(--win); border-left: 2px solid var(--line); }
+.win-body::-webkit-scrollbar-thumb { background: var(--ink); border: 2px solid var(--win); }
+
+/* ---- АДАПТИВ (телефон: одно окно на весь экран, без перетаскивания) ------ */
+body.is-mobile .win {
+  left: 6px !important; right: 6px !important;
+  top: calc(var(--menu-h) + 6px) !important;
+  width: auto !important;
+  max-width: none; max-height: calc(100vh - var(--menu-h) - 12px);
+  height: calc(100vh - var(--menu-h) - 12px);
+}
+body.is-mobile .win-title { height: 30px; font-size: 12px; }
+body.is-mobile .win-close { width: 30px; flex-basis: 30px; }
+body.is-mobile .infobox { float: none; width: 100%; margin: 0 0 12px; }
+body.is-mobile .icons { flex-direction: row; max-height: none; gap: 4px; }
+body.is-mobile .dicon.trash { position: static; }
+body.is-mobile .menubar { font-size: 11px; }
+body.is-mobile .mb-item { padding: 0 9px; }
+body.is-mobile .mb-clock { display: none; }
+body.is-mobile .article .a-body p,
+body.is-mobile .article .a-body h2 { max-width: none; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
