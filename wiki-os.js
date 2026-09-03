@@ -12,6 +12,17 @@
   var BY_ID = {};
   ARTICLES.forEach(function (a) { BY_ID[a.id] = a; });
 
+  // индекс «ссылки сюда»: кто ссылается на каждую статью
+  var BACKLINKS = {};
+  ARTICLES.forEach(function (a) {
+    var html = (a.intro || '') + (a.sections || []).map(function (s) { return s.html; }).join('') +
+               (a.infobox ? JSON.stringify(a.infobox.rows) : '');
+    var set = {};
+    (html.match(/#\/([a-z0-9\-]+)/g) || []).forEach(function (m) { var t = m.slice(2); if (BY_ID[t] && t !== a.id) set[t] = 1; });
+    (a.seeAlso || []).forEach(function (t) { if (BY_ID[t] && t !== a.id) set[t] = 1; });
+    Object.keys(set).forEach(function (t) { (BACKLINKS[t] = BACKLINKS[t] || []).push(a.id); });
+  });
+
   /* ---- пиксельные иконки (SVG, моно, currentColor) --------------------- */
   var ICO = {
     folder: '<svg viewBox="0 0 20 18" fill="none" stroke="currentColor" stroke-width="1.4" shape-rendering="crispEdges"><path d="M1 4h6l2 2h10v10H1z"/><path d="M1 4h6l2 2"/></svg>',
@@ -19,7 +30,9 @@
     doc:    '<svg viewBox="0 0 20 18" fill="none" stroke="currentColor" stroke-width="1.4" shape-rendering="crispEdges"><path d="M4 1h8l4 4v12H4z"/><path d="M12 1v4h4"/><line x1="6" y1="8" x2="14" y2="8"/><line x1="6" y1="11" x2="14" y2="11"/><line x1="6" y1="14" x2="11" y2="14"/></svg>',
     find:   '<svg viewBox="0 0 20 18" fill="none" stroke="currentColor" stroke-width="1.6" shape-rendering="crispEdges"><circle cx="8" cy="7" r="5"/><line x1="12" y1="11" x2="17" y2="16"/></svg>',
     note:   '<svg viewBox="0 0 20 18" fill="none" stroke="currentColor" stroke-width="1.4" shape-rendering="crispEdges"><rect x="3" y="1" width="14" height="16"/><line x1="6" y1="5" x2="14" y2="5"/><line x1="6" y1="8" x2="14" y2="8"/><line x1="6" y1="11" x2="14" y2="11"/><line x1="6" y1="14" x2="11" y2="14"/></svg>',
-    trash:  '<svg viewBox="0 0 20 18" fill="none" stroke="currentColor" stroke-width="1.4" shape-rendering="crispEdges"><path d="M4 4h12l-1 13H5z"/><line x1="2" y1="4" x2="18" y2="4"/><path d="M8 4V2h4v2"/><line x1="8" y1="7" x2="8" y2="14"/><line x1="12" y1="7" x2="12" y2="14"/></svg>'
+    trash:  '<svg viewBox="0 0 20 18" fill="none" stroke="currentColor" stroke-width="1.4" shape-rendering="crispEdges"><path d="M4 4h12l-1 13H5z"/><line x1="2" y1="4" x2="18" y2="4"/><path d="M8 4V2h4v2"/><line x1="8" y1="7" x2="8" y2="14"/><line x1="12" y1="7" x2="12" y2="14"/></svg>',
+    image:  '<svg viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="1.6" shape-rendering="crispEdges"><rect x="2" y="2" width="20" height="16"/><circle cx="8" cy="7" r="2"/><path d="M3 17l6-6 4 4 3-3 5 5"/></svg>',
+    lock:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" shape-rendering="crispEdges"><rect x="4" y="10" width="16" height="12"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/><rect x="11" y="14" width="2" height="4"/></svg>'
   };
 
   /* ---- элементы каркаса ------------------------------------------------ */
@@ -38,13 +51,25 @@
   }
   function setMobileFlag() { document.body.classList.toggle('is-mobile', isMobile()); }
 
+  function applyTheme(t) {
+    document.body.classList.toggle('dark', t === 'dark');
+    var btn = document.getElementById('theme-btn');
+    if (btn) btn.textContent = (t === 'dark' ? 'ТЕМА: ТЁМНАЯ' : 'ТЕМА: СВЕТЛАЯ');
+    try { localStorage.setItem('pd04-theme', t); } catch (e) {}
+  }
+  function toggleTheme() { applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark'); }
+
   /* ---- утилиты по данным ----------------------------------------------- */
   function stripHtml(html) { var d = document.createElement('div'); d.innerHTML = html || ''; return (d.textContent || '').replace(/\s+/g, ' ').trim(); }
   function byTitle(x, y) { return x.title.localeCompare(y.title, 'ru'); }
+  var CAT_ORDER = ['База', 'Сайт СОКА', 'Пилоты', 'ИИ', 'Корабли', 'Ивенты', 'Мир'];
+  function catRank(c) { var i = CAT_ORDER.indexOf(c); return i === -1 ? 99 : i; }
   function categories() {
     var set = {};
     ARTICLES.forEach(function (a) { (a.categories || []).forEach(function (c) { set[c] = (set[c] || 0) + 1; }); });
-    return Object.keys(set).sort(function (x, y) { return x.localeCompare(y, 'ru'); }).map(function (c) { return { name: c, count: set[c] }; });
+    return Object.keys(set).sort(function (x, y) {
+      return (catRank(x) - catRank(y)) || x.localeCompare(y, 'ru');
+    }).map(function (c) { return { name: c, count: set[c] }; });
   }
   function inCategory(cat) { return ARTICLES.filter(function (a) { return (a.categories || []).indexOf(cat) !== -1; }).sort(byTitle); }
   function articleText(a) {
@@ -79,24 +104,27 @@
       h += '<div class="dicon" data-i="' + i + '"><span class="glyph">' + ICO[it.ic] +
            '</span><span class="label">' + it.label + '</span></div>';
     });
-    // корзина — во флаворе референса, отдельно внизу
-    h += '<div class="dicon trash" data-trash="1"><span class="glyph">' + ICO.trash +
-         '</span><span class="label">КОРЗИНА</span></div>';
     elIcons.innerHTML = h;
+
+    // корзина — отдельно, в углу рабочего стола, чтобы не слипалась с сеткой
+    var trash = document.createElement('div');
+    trash.className = 'dicon trash';
+    trash.innerHTML = '<span class="glyph">' + ICO.trash + '</span><span class="label">КОРЗИНА</span>';
+    elDesktop.appendChild(trash);
 
     elIcons.querySelectorAll('.dicon[data-i]').forEach(function (el) {
       var it = items[+el.getAttribute('data-i')];
       el.addEventListener('click', function () { selectIcon(el); it.act(); });
     });
-    var trash = elIcons.querySelector('[data-trash]');
-    trash.addEventListener('click', function () {
-      selectIcon(trash);
+    var trashEl = elDesktop.querySelector('.dicon.trash');
+    trashEl.addEventListener('click', function () {
+      selectIcon(trashEl);
       makeWindow({ key: 'trash', name: 'КОРЗИНА', sub: '0 файлов',
         bodyHtml: '<div class="empty-note">Корзина пуста.<br>СОКА бы сказала: «а ты чего ждал?»</div>', w: 300 });
     });
   }
   function selectIcon(el) {
-    elIcons.querySelectorAll('.dicon.selected').forEach(function (d) { d.classList.remove('selected'); });
+    elDesktop.querySelectorAll('.dicon.selected').forEach(function (d) { d.classList.remove('selected'); });
     el.classList.add('selected');
   }
 
@@ -121,6 +149,7 @@
     var w = document.createElement('div');
     w.className = 'win';
     if (opts.key) w.dataset.key = opts.key;
+    w.dataset.kind = opts.kind || 'plain';
 
     var sub = opts.sub ? '<div class="win-sub">' + opts.sub + '</div>' : '';
     w.innerHTML =
@@ -148,14 +177,37 @@
     w.addEventListener('mousedown', function () { focusWindow(w); });
     // перетаскивание за титул (только десктоп)
     dragify(w);
+    resizify(w);
     // перехват внутренних ссылок #/...
     w.querySelector('.win-body').addEventListener('click', onInnerClick);
     // клики по строкам файлов
     w.querySelectorAll('.filerow[data-open]').forEach(function (row) {
       row.addEventListener('click', function () { openArticle(row.getAttribute('data-open')); });
     });
+    wireCarousels(w);
     if (opts.onMount) opts.onMount(w);
     return w;
+  }
+
+  function resizify(w) {
+    if (isMobile()) return;
+    var grip = document.createElement('div');
+    grip.className = 'win-resize';
+    w.appendChild(grip);
+    var sx, sy, ow, oh, rs = false;
+    grip.addEventListener('mousedown', function (e) {
+      if (isMobile()) return;
+      rs = true; focusWindow(w);
+      sx = e.clientX; sy = e.clientY; ow = w.offsetWidth; oh = w.offsetHeight;
+      e.preventDefault(); e.stopPropagation();
+    });
+    window.addEventListener('mousemove', function (e) {
+      if (!rs) return;
+      var nw = Math.max(260, Math.min(ow + (e.clientX - sx), window.innerWidth - 12));
+      var nh = Math.max(150, Math.min(oh + (e.clientY - sy), window.innerHeight - 40));
+      w.style.width = nw + 'px'; w.style.height = nh + 'px';
+    });
+    window.addEventListener('mouseup', function () { rs = false; });
   }
 
   function dragify(w) {
@@ -180,10 +232,22 @@
   }
 
   function onInnerClick(e) {
+    var root = e.currentTarget;
     var a = e.target.closest('a[href^="#/"]');
-    if (!a) return;
-    e.preventDefault();
-    routeHash(a.getAttribute('href'));
+    if (a) { e.preventDefault(); routeHash(a.getAttribute('href')); return; }
+    var toc = e.target.closest('.toc-link');
+    if (toc) {
+      var sec = root.querySelector('.art-sec[data-sec="' + toc.getAttribute('data-sec') + '"]');
+      if (sec) { sec.classList.remove('collapsed'); sec.scrollIntoView({ block: 'start' }); }
+      return;
+    }
+    var sh = e.target.closest('.sec-h');
+    if (sh) { sh.parentNode.classList.toggle('collapsed'); return; }
+    var cell = e.target.closest('[data-lb-i]');
+    if (cell) {
+      var box = cell.closest('[data-lb-id]');
+      if (box) openLightbox(box.dataset.lbId, +box.dataset.lbN, +cell.dataset.lbI);
+    }
   }
   function routeHash(href) {
     var h = href.replace(/^#\/?/, '');
@@ -209,11 +273,42 @@
   }
 
   /* ---- окно-статья ----------------------------------------------------- */
+  function renderCarousel(a) {
+    var n = a.gallery || 0; if (!n) return '';
+    var cells = '';
+    for (var i = 1; i <= n; i++) {
+      var fn = 'картинки/' + a.id + '-' + i + '.png';
+      cells += '<figure class="cr-cell' + (i === 1 ? ' active' : '') + '" data-lb-i="' + i + '">' +
+        '<span class="cr-ph">' + ICO.image + '<small>' + fn + '</small></span>' +
+        '<img src="' + fn + '" alt="" onerror="this.remove()"></figure>';
+    }
+    var nav = n > 1
+      ? '<button class="cr-prev" aria-label="Назад">&lt;</button>' +
+        '<button class="cr-next" aria-label="Вперёд">&gt;</button>' +
+        '<div class="cr-count">1 / ' + n + '</div>'
+      : '';
+    return '<div class="carousel" data-idx="0" data-count="' + n + '" data-lb-id="' + a.id + '" data-lb-n="' + n + '"><div class="cr-track">' + cells + '</div>' + nav + '</div>';
+  }
+  function wireCarousels(w) {
+    w.querySelectorAll('.carousel').forEach(function (c) {
+      var count = +c.dataset.count; if (count < 2) return;
+      var cells = c.querySelectorAll('.cr-cell');
+      var counter = c.querySelector('.cr-count');
+      function show(i) {
+        i = (i % count + count) % count; c.dataset.idx = i;
+        cells.forEach(function (cell, ci) { cell.classList.toggle('active', ci === i); });
+        if (counter) counter.textContent = (i + 1) + ' / ' + count;
+      }
+      c.querySelector('.cr-prev').addEventListener('click', function (e) { e.stopPropagation(); show(+c.dataset.idx - 1); });
+      c.querySelector('.cr-next').addEventListener('click', function (e) { e.stopPropagation(); show(+c.dataset.idx + 1); });
+    });
+  }
   function renderInfobox(a) {
     if (!a.infobox) return '';
     var ib = a.infobox;
     var h = '<aside class="infobox"><div class="ib-head"><span class="ib-emblem">' + (a.emblem || '?') +
       '</span><span class="ib-title">' + a.title + '</span></div>';
+    h += renderCarousel(a);
     if (ib.caption) h += '<div class="ib-caption">' + ib.caption + '</div>';
     h += '<table class="ib-table"><tbody>';
     (ib.rows || []).forEach(function (r) { h += '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>'; });
@@ -230,18 +325,50 @@
     return '<div class="see-also"><h2>См. также</h2><ul>' +
       ids.map(function (id) { return '<li><a href="#/' + id + '">' + BY_ID[id].title + '</a></li>'; }).join('') + '</ul></div>';
   }
+  function renderGallery(a) {
+    if (!a.gallery) return '';
+    var n = a.gallery, frames = '';
+    for (var i = 1; i <= n; i++) {
+      var fn = 'картинки/' + a.id + '-' + i + '.png';
+      frames += '<figure class="gframe" data-lb-i="' + i + '"><div class="gf-bar">' + fn + '</div>' +
+        '<div class="gf-img"><span class="gf-ph">' + ICO.image + '</span>' +
+        '<img src="' + fn + '" alt="" onerror="this.remove()"></div></figure>';
+    }
+    return '<div class="gallery" data-lb-id="' + a.id + '" data-lb-n="' + n + '">' + frames + '</div>';
+  }
   function openArticle(id) {
     var a = BY_ID[id]; if (!a) return;
+    if (a.locked) {
+      var lb = '<div class="article"><div class="locked"><div class="lock-ic">' + ICO.lock + '</div>' +
+        '<div class="lock-h">ЗАКРЫТО</div><p>Раздел «' + a.title + '» пока под визуальным замком.</p></div></div>';
+      makeWindow({ key: 'art:' + id, name: (a.title + '.doc').toUpperCase(), sub: 'LOCK', bodyHtml: lb, w: 420, kind: 'art' });
+      return;
+    }
     var body = '<div class="article">';
     if (a.stub) body += '<div class="stub-note"><b>ЗАГОТОВКА.</b> Файл намеренно неполон — часть данных ещё не раскрыта.</div>';
     body += '<div class="a-title">' + a.title + '</div>';
     if (a.aka && a.aka.length) body += '<div class="a-aka">' + a.aka.slice(0, 4).join(' · ') + '</div>';
     body += renderInfobox(a);
     body += '<div class="a-body">' + (a.intro || '');
-    (a.sections || []).forEach(function (s) { body += '<h2>' + s.h + '</h2>' + s.html; });
-    body += renderSeeAlso(a) + renderCats(a) + '</div></div>';
+    if (!a.infobox) body += renderGallery(a);
+    var secs = a.sections || [];
+    if (secs.length >= 3) {
+      body += '<nav class="toc"><div class="toc-h">СОДЕРЖАНИЕ</div><ol>';
+      secs.forEach(function (s, i) { body += '<li><a class="toc-link" data-sec="' + i + '">' + s.h + '</a></li>'; });
+      body += '</ol></nav>';
+    }
+    secs.forEach(function (s, i) {
+      var col = /^Досье/.test(s.h) ? ' collapsed' : '';
+      body += '<section class="art-sec' + col + '" data-sec="' + i + '"><h2 class="sec-h">' + s.h + '</h2><div class="sec-body">' + s.html + '</div></section>';
+    });
+    body += renderSeeAlso(a);
+    var bl = BACKLINKS[a.id] || [];
+    if (bl.length) body += '<div class="backlinks"><h2>Ссылки сюда</h2><ul>' +
+      bl.map(function (id) { return '<li><a href="#/' + id + '">' + BY_ID[id].title + '</a></li>'; }).join('') + '</ul></div>';
+    body += renderCats(a);
+    body += '</div></div>';
     makeWindow({ key: 'art:' + id, name: (a.title + '.doc').toUpperCase(),
-      sub: (a.stub ? 'DIR/?' : 'DIR/ok'), bodyHtml: body, w: 560 });
+      sub: (a.stub ? 'DIR/?' : 'DIR/ok'), bodyHtml: body, w: 680, kind: 'art' });
   }
 
   /* ---- окно-поиск ------------------------------------------------------ */
@@ -282,13 +409,74 @@
     var body = '<div class="article"><div class="a-body" style="max-width:none">' +
       '<div class="a-title" style="font-family:var(--font-ui);font-size:15px">КОДЕКС ПАНДЕМОНИУМ</div>' +
       '<p>Авторская энциклопедия вселенной <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>. ' +
-      'Здесь собрано то, что известно точно: персонажи, корабль, станция <a href="#/astralis">Астралис</a> и устройство мира.</p>' +
-      '<p>Открывайте папки-диски на рабочем столе или ищите через «ПОИСК». ' +
-      'Часть мира намеренно оставлена в тени — Кодекс объясняет устройство, но не раскрывает загадки.</p>' +
-      '<p><em>Клик по иконке или файлу открывает окно. Крестик слева — закрыть. Меню «Переход» — прыгнуть в любую статью.</em></p>' +
+      'Здесь собрано то, что известно с основного сайта: персонажи, корабль, доступные секретки, устройство мира.</p>' +
+      '<p>Открывайте папки-диски на рабочем столе или ищите через "ПОИСК". ' +
+      'Часть мира намеренно оставлена в недосказанной - Кодекс объясняет устройство, но не раскрывает загадки.</p>' +
+      '<p><em>Клик по иконке или файлу открывает окно. Крестик слева - закрыть. Меню "Переход" - прыгнуть в любую статью.</em></p>' +
       '</div></div>';
     makeWindow({ key: 'readme', name: 'О КОДЕКСЕ', sub: '', bodyHtml: body, w: 420 });
   }
+
+  /* ---- ЛАЙТБОКС (просмотр фото на весь экран + лента миниатюр) --------- */
+  var lbEl, lbState = { id: null, n: 0, i: 1 };
+  function buildLightbox() {
+    lbEl = document.createElement('div');
+    lbEl.className = 'lightbox';
+    lbEl.innerHTML =
+      '<div class="lb-backdrop"></div>' +
+      '<div class="lb-frame">' +
+        '<div class="lb-title"><div class="lb-close" title="Закрыть">\u00d7</div>' +
+          '<div class="lb-name"></div><div class="lb-count"></div></div>' +
+        '<div class="lb-stage"><span class="lb-ph"></span><img class="lb-img" alt="">' +
+          '<button class="lb-prev" aria-label="Назад">&lt;</button>' +
+          '<button class="lb-next" aria-label="Вперёд">&gt;</button></div>' +
+        '<div class="lb-strip"></div>' +
+      '</div>';
+    document.body.appendChild(lbEl);
+    lbEl.querySelector('.lb-close').addEventListener('click', closeLightbox);
+    lbEl.querySelector('.lb-backdrop').addEventListener('click', closeLightbox);
+    lbEl.querySelector('.lb-prev').addEventListener('click', function () { showLb(lbState.i - 1); });
+    lbEl.querySelector('.lb-next').addEventListener('click', function () { showLb(lbState.i + 1); });
+    document.addEventListener('keydown', function (e) {
+      if (!lbEl.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowLeft') showLb(lbState.i - 1);
+      else if (e.key === 'ArrowRight') showLb(lbState.i + 1);
+    });
+  }
+  function openLightbox(id, n, i) {
+    lbState.id = id; lbState.n = n;
+    var strip = lbEl.querySelector('.lb-strip'), th = '';
+    for (var k = 1; k <= n; k++) {
+      var fn = 'картинки/' + id + '-' + k + '.png';
+      th += '<figure class="lb-thumb" data-i="' + k + '"><span class="lb-tph">' + ICO.image + '</span>' +
+        '<img src="' + fn + '" alt="" onerror="this.remove()"></figure>';
+    }
+    strip.innerHTML = th;
+    strip.querySelectorAll('.lb-thumb').forEach(function (t) {
+      t.addEventListener('click', function () { showLb(+t.dataset.i); });
+    });
+    var multi = n > 1;
+    lbEl.querySelector('.lb-prev').style.display = multi ? '' : 'none';
+    lbEl.querySelector('.lb-next').style.display = multi ? '' : 'none';
+    strip.style.display = multi ? '' : 'none';
+    lbEl.classList.add('open');
+    showLb(i);
+  }
+  function showLb(i) {
+    var n = lbState.n; i = ((i - 1 + n) % n) + 1; lbState.i = i;
+    var fn = 'картинки/' + lbState.id + '-' + i + '.png';
+    var img = lbEl.querySelector('.lb-img'), ph = lbEl.querySelector('.lb-ph');
+    ph.innerHTML = ICO.image + '<small>' + fn + '</small>';
+    ph.style.display = 'grid'; img.style.display = 'none';
+    img.onload = function () { img.style.display = 'block'; ph.style.display = 'none'; };
+    img.onerror = function () { img.style.display = 'none'; ph.style.display = 'grid'; };
+    img.src = fn;
+    lbEl.querySelector('.lb-name').textContent = fn;
+    lbEl.querySelector('.lb-count').textContent = i + ' / ' + n;
+    lbEl.querySelectorAll('.lb-thumb').forEach(function (t) { t.classList.toggle('active', +t.dataset.i === i); });
+  }
+  function closeLightbox() { lbEl.classList.remove('open'); }
 
   /* ---- меню-бар -------------------------------------------------------- */
   function buildMenus() {
@@ -310,18 +498,19 @@
       { title: 'Переход', rows: goRows }
     ];
 
-    var h = '<div class="mb-brand"><span class="diamond">\u25c6</span> КОДЕКС</div>';
+    var h = '<div class="mb-brand"><span class="diamond"></span>КОДЕКС</div>';
     menus.forEach(function (m, mi) {
       h += '<div class="mb-item" data-m="' + mi + '">' + m.title +
         '<div class="mb-drop">' + m.rows.map(function (r) {
           return r.sep ? '<div class="mb-sep"></div>' : '<div class="mb-row">' + r.label + '</div>';
         }).join('') + '</div></div>';
     });
+    h += '<div class="mb-item mb-theme" id="theme-btn">ТЕМА</div>';
     h += '<div class="mb-clock" id="clock">--:--</div>';
     elMenubar.innerHTML = h;
     elClock = document.getElementById('clock');
 
-    elMenubar.querySelectorAll('.mb-item').forEach(function (item) {
+    elMenubar.querySelectorAll('.mb-item[data-m]').forEach(function (item) {
       var mi = +item.getAttribute('data-m');
       var rowsEls = item.querySelectorAll('.mb-row');
       var real = menus[mi].rows.filter(function (r) { return !r.sep; });
@@ -336,6 +525,8 @@
       });
     });
     document.addEventListener('click', closeMenus);
+    var tb = document.getElementById('theme-btn');
+    if (tb) tb.addEventListener('click', function (e) { e.stopPropagation(); closeMenus(); toggleTheme(); });
   }
   function closeMenus() { elMenubar.querySelectorAll('.mb-item.open').forEach(function (i) { i.classList.remove('open'); }); }
 
@@ -351,6 +542,10 @@
   window.addEventListener('resize', setMobileFlag);
   buildMenus();
   buildDesktop();
+  buildLightbox();
+  var savedTheme = 'light';
+  try { savedTheme = localStorage.getItem('pd04-theme') || 'light'; } catch (e) {}
+  applyTheme(savedTheme);
   tick(); setInterval(tick, 15000);
 
   // приветственное окно при первом заходе

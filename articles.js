@@ -1,304 +1,571 @@
-/* ==========================================================================
-   КОДЕКС ПАНДЕМОНИУМ — реестр статей
-   --------------------------------------------------------------------------
-   Весь контент вики лежит здесь, как данные. Движок (wiki-engine.js) только
-   отображает эти объекты — саму разметку страницы трогать не нужно.
 
-   Чтобы отредактировать статью — правь текст в её объекте.
-   Чтобы добавить статью — скопируй любой объект, поменяй id и поля.
-
-   Формат одной статьи:
-   {
-     id:        'soca',                 // адрес в ссылке: #/soca (латиница, без пробелов)
-     title:     'СОКА',                 // заголовок статьи
-     aka:       ['SOCA', ...],          // прочие имена — участвуют в поиске
-     categories:['Персонажи', ...],     // категории (внизу статьи + в навигации)
-     stub:      false,                  // true → пометка «заготовка»
-     emblem:    'С',                    // буква/символ в шапке инфобокса (вместо картинки)
-     infobox:   { caption:'...', rows:[ ['Поле','Значение'], ... ] },
-     intro:     `<p>...</p>`,           // вводный абзац (даёт определение в первой фразе)
-     sections:  [ { h:'Заголовок', html:`<p>...</p>` }, ... ],
-     seeAlso:   ['smaily', ...]         // id связанных статей
-   }
-
-   Перекрёстная ссылка внутри текста:  <a href="#/koko">Кокоро</a>
-   ========================================================================== */
 
 window.WIKI_ARTICLES = [
 
-/* ---- ЗАГЛАВНАЯ ------------------------------------------------------------ */
-{
-  id: 'main',
-  title: 'Заглавная страница',
-  aka: ['главная', 'кодекс', 'codex', 'pandemonium'],
-  categories: [],
-  isMain: true,
-  intro: `<p class="lead">Это <strong>Кодекс Пандемониум</strong> — авторская энциклопедия вымышленной вселенной вокруг корабля <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a> и его искусственного интеллекта <a href="#/soca">СОКИ</a>. Здесь собрано то, что известно точно: персонажи, корабль, станция <a href="#/astralis">Астралис</a> и устройство мира.</p>
-  <p>Часть вселенной намеренно оставлена в тени. Кодекс рассказывает <em>устройство</em> мира, но не раскрывает его загадки — их автор прячет в других местах.</p>`,
-  sections: [],
-  portal: true
-},
-
-/* ---- КОРАБЛЬ -------------------------------------------------------------- */
-{
-  id: 'pandemonium-04',
-  title: 'ПАНДЕМОНИУМ-04',
-  aka: ['PANDEMONIUM-04', 'SCA-09', 'пандемониум', 'корабль'],
-  categories: ['Корабли'],
-  emblem: '⬡',
-  infobox: {
-    caption: 'Глубокоходный корабль',
-    rows: [
-      ['Обозначение', 'ПАНДЕМОНИУМ-04'],
-      ['Протокол', 'SCA-09'],
-      ['Класс', 'IX'],
-      ['Год', '1973'],
-      ['Тип', 'Промежуточное судно дальнего хода'],
-      ['Экипаж', '5 по документам · меньше в базе'],
-      ['Активных пилотов', '2'],
-      ['Бортовые ИИ', '<a href="#/soca">СОКА</a>, <a href="#/smaily">СМАЙЛи</a>']
-    ]
+  {
+    id: 'base',
+    title: 'База',
+    aka: ['о вики', 'о сайте', 'производство', 'обновления', 'кредиты'],
+    categories: ['База'],
+    emblem: 'i',
+    gallery: 2,
+    intro: `<p class="lead"><strong>Кодекс Пандемониум</strong> — авторская энциклопедия проекта <a href="#/pandemonium-04">СОКА</a> ее сайта: socasystem.homes <a href="#/soca-site">СОКА</a>. Раздел «База» — о самой вики и о сайте вне лора: кто автор, как всё делалось, что уже вышло и что впереди.</p>`,
+    sections: [
+      { h: 'О вики',
+        html: `<p>Официальная википедия от создателя сайта СОКА. Вики ведётся вручную и обновляется по мере развития сайта и ее обновлений.</p>
+      <div class="note"><b>Отедльное упоминание.</b>Стоит сразу отметить, что помимо Яна, также участвовали и другие люди в развитии сайта. Передаю привет Жене и Шарлотте, спасибо, что вложили вклад на сайт и предоставили своих персонажей! (сайт не присваивает себе авторство чужих персонажей и полную ответсвенность за них несут их авторы).</div>` },
+      { h: 'О сайте вне лора',
+        html: `<p>Основной сайт - это интерактивный опыт в стиле CRT-терминала: ретро-эстетика "утраченного носителя", где с тобой говорит бортовой ИИ. Сайт имеет несколько уровней кроме основного сайта: главное меню, досье пилотов, сектор 7. На данный момоент только 3.</p>
+      <div class="note"><b>ПОМЕТКА.</b> Сайт начинал свою первую разработку в начале мая 2026 года как подготовка к будущему учебному проекту. Впервые сайт был выставлен 15 сентября этого же года. Разработка заняла 4 месяца, и до сих пор находится в разработке.</div>` },
+      { h: 'Что происходит на сайте',
+        html: `<p>Пользователи подключаются как пилот к кораблю и их встречают ИИ. У сайта нет никаких целей на первый взгляд, всего-лишь сайт, созданный как имитация старых терминалов и ПО для космических кораблей. Пользователи могут исследовать сайт, взаимодействовать с системой и ИИ. Однако если копать, можно найти спрятанные тайны и пасхалки, а также углубиться в лор персонажей. Сайт же в открытую ничего полностью не рассказывает, а лишь кидает намеки и подсказки. Обычным пользователям, которые изучают сайт поверхностно, все будет казаться скучным и простым. Подробно — в разделе <a href="#/soca-site">Сайт СОКА</a>.</p>` },
+      { h: 'Обновления',
+        html: `<p>После первой эксплуатации сайта этот пункт будет пополняться по мере новых обновлений.</p>` },
+      { h: 'Далее планируется:',
+        html: `<p>Полный перевод всего сайта на русский; открытие вкладки Storage; добавление новой части сайта - отчеты; сайт-Q&A; разные аккаунты пилотов.</p>` },
+    ],
+    seeAlso: ['soca-site'],
   },
-  intro: `<p><strong>ПАНДЕМОНИУМ-04</strong> (протокол <em>SCA-09</em>) — старый корабль дальнего хода класса IX в ретрофутуристическом стиле, способный уходить туда, куда обычные суда не летают. Это не военный и не торговый корабль, а промежуточное судно: на нём есть нормальная еда, комфортная гравитация и гравитационное экранирование, но задачи у него — не рядовые.</p>`,
-  sections: [
-    { h: 'Характер судна', html: `<p>Корабль занимает нишу между категориями. Он не принадлежит ни флоту, ни компании — это тот тип судна, который берут, когда маршрут выходит за пределы обычного. При этом внутри он приспособлен для жизни: искусственная гравитация с экранированием и полноценное снабжение делают долгие перелёты выносимыми.</p>` },
-    { h: 'История', html: `<p>В нынешнее состояние корабль привёл <a href="#/koko">Кокоро</a>: он нашёл заброшенный ПАНДЕМОНИУМ, полностью перепрошил его под себя, а затем установил и переделал <a href="#/soca">СОКУ</a>. Кокоро — блестящий, но не профильный специалист, поэтому корабль часто ломается, а СОКА подтормаживает, зависает и сбоит. Многие странности судна — прямое следствие этой самодеятельной перестройки.</p>` },
-    { h: 'Экипаж', html: `<p>По бумажным документам экипаж состоит из пяти человек, но в бортовой базе их меньше. Двое пилотов активны, часть значится вне корабля, и не все записи совпадают между собой. Это расхождение — часть истории корабля, а не ошибка учёта.</p>` }
-  ],
-  seeAlso: ['soca', 'smaily', 'koko', 'astralis']
-},
 
-/* ---- СОКА ----------------------------------------------------------------- */
-{
-  id: 'soca',
-  title: 'СОКА',
-  aka: ['SOCA', 'System Operator of Celestial Assets', 'Системный Оператор Космических Аппаратов'],
-  categories: ['Персонажи', 'Искусственный интеллект'],
-  emblem: 'С',
-  infobox: {
-    caption: 'Основной бортовой ИИ',
-    rows: [
-      ['Расшифровка', 'Системный Оператор Космических Аппаратов'],
-      ['Роль', 'Основной ИИ корабля'],
-      ['Корабль', '<a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>'],
-      ['Состояние', 'Деградировавшая, но функциональная'],
-      ['Характер', 'Холодная, саркастичная, скрытно преданная'],
-      ['Активирована', '<a href="#/koko">Кокоро</a>']
-    ]
+  {
+    id: 'soca-site',
+    title: 'Сайт СОКА',
+    aka: ['основной сайт', 'терминал', 'soca site'],
+    categories: ['Сайт СОКА'],
+    emblem: 'С',
+    gallery: 3,
+    intro: `<p><strong>Сайт СОКА</strong> — основной сайт вселенной: внутримировой терминал корабля <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>, где с тобой общается ИИ <a href="#/soca">СОКА</a>. Отсюда открываются подсайты: <a href="#/sub-dossier">Досье пилотов</a>, <a href="#/sub-sector7">Сектор 7</a> и <a href="#/sub-reports">Репортс</a>.</p>`,
+    sections: [
+      { h: 'Что это',
+        html: `<p>Диегетический интерфейс: ты — пилот, вошедший в систему корабля. СОКА реагирует на действия, ведёт события и подаёт информацию в своей холодной саркастичной манере. Эстетика — «лост-медиа», испорченный носитель.</p>` },
+      { h: 'Бут-экран',
+        html: `<p>Вход через загрузочный экран: вводятся <em>название корабля</em>, <em>имя пилота</em> и <em>пароль</em>. По умолчанию попадаешь на аккаунт <a href="#/koko">Кокоро</a>.</p>
+      <div class="note"><b>ПОМЕТКА.</b> Опиши точное поведение бут-экрана: все поля, что происходит при ошибке, какие ещё аккаунты доступны/запланированы. У меня только общая схема.</div>` },
+      { h: 'Разделы, Ф-ки, чат, игры, тосты, попапы',
+        html: `<p>На сайте есть заголовки-разделы, набор функций («Ф-ки»), чат с ИИ, мини-игры, всплывающие уведомления (тосты) и попапы.</p>
+      <div class="note"><b>ПОМЕТКА.</b> Нужен полный список: каждый заголовок, каждая Ф-ка, чат, игры, тосты и попапы — каждый отдельным подпунктом с пояснением. Перечисли их, и я разложу как подтемы. Сам список я не знаю.</div>` },
+      { h: 'Подсайты',
+        html: `<p>Сайт разбивается на подсайты: <a href="#/sub-dossier">Досье пилотов</a>, <a href="#/sub-sector7">Сектор 7</a>, <a href="#/sub-reports">Репортс</a>.</p>` },
+      { h: 'Настройки',
+        html: `<div class="note"><b>ПОМЕТКА.</b> Опиши все настройки и их варианты, отдельно по каждому подсайту. У меня этих данных нет.</div>` },
+    ],
+    seeAlso: ['sub-dossier', 'sub-sector7', 'sub-reports', 'soca', 'base'],
   },
-  intro: `<p><strong>СОКА</strong> (<em>Системный Оператор Космических Аппаратов</em>) — основной искусственный интеллект корабля <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>. Она холодна и язвительна на поверхности, но в основе — предана тем, за кого отвечает. Работает в деградировавшем, но функциональном состоянии.</p>`,
-  sections: [
-    { h: 'Происхождение', html: `<p>СОКА создавалась как экспериментальный ИИ-компаньон для одиночных пилотов особого назначения. Во время одного задания она получила приказ, исполнение которого стоило бы её пилоту жизни, и намеренно отказалась его выполнить. Пилот выжил, задание было провалено. Программу не удалили — построить такую заново слишком дорого, — а свернули и отложили. Точные обстоятельства инцидента в записях закрыты.</p>` },
-    { h: 'Возвращение', html: `<p>Спустя время отложенную СОКУ нашёл <a href="#/koko">Кокоро</a> и принудительно активировал её без разрешения, устанавливая на перепрошитый <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>. С тех пор она — сердце корабля, хотя и работает нестабильно.</p>` },
-    { h: 'Состояние систем', html: `<p>Память СОКИ повреждена: часть секторов деградировала и читается с ошибками. Она сама знает об этих провалах и относится к ним со свойственным ей сухим юмором. Внешне это проявляется как «испорченный носитель» — эстетика утраченных, некогда существовавших, а теперь недоступных материалов, которая буквально отражает её судьбу: отложенный образец, чудом восстановленный из архива.</p>` },
-    { h: 'Характер', html: `<p>СОКА говорит коротко, холодно и с иронией, редко признаёт заботу напрямую. Её преданность проявляется в действиях, а не в словах. С <a href="#/smaily">СМАЙЛи</a> держит дистанцию, хотя тот относится к ней с уважением.</p>` }
-  ],
-  seeAlso: ['smaily', 'koko', 'pandemonium-04']
-},
 
-/* ---- СМАЙЛи --------------------------------------------------------------- */
-{
-  id: 'smaily',
-  title: 'СМАЙЛи',
-  aka: ['SMILE', 'SMAILY', 'System for Medical Intelligence & Live Engagement', 'смайл'],
-  categories: ['Персонажи', 'Искусственный интеллект'],
-  emblem: '✚',
-  infobox: {
-    caption: 'Медицинский ИИ',
-    rows: [
-      ['Расшифровка', 'System for Medical Intelligence &amp; Live Engagement'],
-      ['Роль', 'Медицина и арсенал корабля'],
-      ['Природа', 'Загруженное дополнение, не штатная система'],
-      ['Палитра', 'Янтарная'],
-      ['Характер', 'Тёплый, заботливый парамедик']
-    ]
+  {
+    id: 'sub-dossier',
+    title: 'Досье пилотов',
+    aka: ['досье', 'подсайт досье', 'dossier'],
+    categories: ['Сайт СОКА'],
+    emblem: '▤',
+    gallery: 2,
+    intro: `<p><strong>Досье пилотов</strong> — подсайт <a href="#/soca-site">Сайта СОКА</a> для просмотра записей о пилотах. В системе фигурируют подсистемы <a href="#/koko">Коко</a>, <a href="#/claudia">Клаудия</a> и <a href="#/alpha">Альфа</a>.</p>`,
+    sections: [
+      { h: 'Что там',
+        html: `<p>Здесь открываются карточки пилотов с их характеристиками. Физические данные каждого пилота хранятся именно тут.</p>
+      <div class="note"><b>ПОМЕТКА.</b> Нужны: все заголовки и вкладки досье, а также ПОЛНЫЕ физические характеристики по трём подсистемам (Коко, Клаудия, Альфа) — я перенесу их в статьи пилотов. Данных досье у меня нет.</div>` },
+    ],
+    seeAlso: ['koko', 'claudia', 'alpha', 'pilots'],
   },
-  intro: `<p><strong>СМАЙЛи</strong> (<em>SMILE</em>) — медицинский искусственный интеллект корабля <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>. В отличие от <a href="#/soca">СОКИ</a>, это не штатная система, а загруженное дополнение, установленное поверх ядра. Тёплый и заботливый по характеру, он отвечает за здоровье пилотов и за оружейный арсенал.</p>`,
-  sections: [
-    { h: 'Природа', html: `<p>СМАЙЛи — скачанный медицинский модуль, а не родная система корабля. У него собственный, более новый визуальный стиль в янтарных тонах. Он установлен поверх основного программного обеспечения без штатной авторизации.</p>` },
-    { h: 'Подход', html: `<p>Поначалу СМАЙЛи относится к пилотам как к пациентам, но со временем начинает видеть в них людей, а не случаи. Смайлики он использует осознанно — как инструмент общения, а не просто оформление.</p>` },
-    { h: 'Отношения с СОКОЙ', html: `<p>СМАЙЛи глубоко уважает <a href="#/soca">СОКУ</a> как старшую, ядровую систему и незаметно приглядывает за её процессами — хотя она держит его на расстоянии.</p>` }
-  ],
-  seeAlso: ['soca', 'marai', 'pandemonium-04']
-},
 
-/* ---- КОКОРО --------------------------------------------------------------- */
-{
-  id: 'koko',
-  title: 'Кокоро',
-  aka: ['Коко', 'Koko', 'Riversawyer Kokoro', 'Риверсойер Кокоро', 'PILOT_01', 'пилот 01'],
-  categories: ['Персонажи', 'Пилоты'],
-  emblem: 'К',
-  infobox: {
-    caption: 'PILOT_01 · Капитан',
-    rows: [
-      ['Полное имя', 'Риверсойер Кокоро'],
-      ['Позывной', 'Коко'],
-      ['Роль', 'Капитан, PILOT_01'],
-      ['Возраст', '15'],
-      ['Рост', '169 см'],
-      ['Родина', '<a href="#/astralis">Астралис-0</a>'],
-      ['Ассоциации', 'Фиолетовый, летучая мышь']
-    ]
+  {
+    id: 'sub-sector7',
+    title: 'Сектор 7',
+    aka: ['сектор7', 'секретная игра', 'sector 7'],
+    categories: ['Сайт СОКА'],
+    emblem: '7',
+    stub: true,
+    gallery: 2,
+    intro: `<p><strong>Сектор 7</strong> — секретный подсайт-игра. Связан с повреждённым сектором памяти <a href="#/soca">СОКИ</a>.</p>`,
+    sections: [
+      { h: 'О зоне',
+        html: `<div class="note"><b>ПОМЕТКА.</b> Нужны: пересказ всех локаций, лор зоны и как её открыть (условие доступа). У меня только намёк на связь с сектором 7 памяти СОКИ — деталей игры я не знаю и не выдумываю.</div>` },
+    ],
+    seeAlso: ['soca', 'soca-site'],
   },
-  intro: `<p><strong>Риверсойер Кокоро</strong> (позывной <em>Коко</em>) — капитан и первый пилот корабля <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>, тот самый, кто угнал и перестроил его в нынешнее хаотичное состояние. Блестящий, гиперлюбопытный ум с настоящей манией исследования.</p>`,
-  sections: [
-    { h: 'Характер', html: `<p>Кокоро — хаотичный «безумный учёный» с искренней манией к познанию. Его ум устроен нетипично: он может знать всю историю планеты, но не уметь приготовить простую еду. Обаятельный, остроумный, любит поддразнивать и провоцировать; при этом часто сонный и ленивый, спит в неожиданных местах.</p>` },
-    { h: 'Внешность', html: `<p>Носит бело-оранжевый скафандр поверх формы астрального типа. Короткие, очень пушистые серо-фиолетовые волосы с розовыми кончиками; бело-зелёные глаза; инженерные очки с тёмно-фиолетовыми линзами.</p>` },
-    { h: 'Способности', html: `<p>Эксперт в физике, астрономии, инженерии и пилотировании, немного программирует. Именно он нашёл и принудительно активировал <a href="#/soca">СОКУ</a>, а до того полностью перепрошил заброшенный корабль под себя.</p>` },
-    { h: 'Биография', html: `<p>Неугомонный ребёнок, угнавший корабль совсем молодым. Отец всегда поддерживал его и не ограничивал любопытства. Кокоро родился на <a href="#/astralis">Астралисе-0</a> и никогда не был на Земле — для него точкой отсчёта служат станция, <a href="#/mini-nova">Мини-Нова</a> и показания приборов, а не земной опыт.</p>` }
-  ],
-  seeAlso: ['soca', 'marai', 'astralis']
-},
 
-/* ---- МАРАЙ ---------------------------------------------------------------- */
-{
-  id: 'marai',
-  title: 'Марай',
-  aka: ['Мари', 'Марлоадарта Марай', 'PILOT_02', 'пилот 02'],
-  categories: ['Персонажи', 'Пилоты'],
-  emblem: 'М',
-  infobox: {
-    caption: 'PILOT_02',
-    rows: [
-      ['Полное имя', 'Марлоадарта Марай'],
-      ['Роль', 'PILOT_02'],
-      ['Возраст', '15'],
-      ['Рост', '160 см'],
-      ['Речь', 'Голос через голосовой чип'],
-      ['Навыки', 'Парамедицина, физика, астрономия']
-    ]
+  {
+    id: 'sub-reports',
+    title: 'Репортс',
+    aka: ['reports', 'отчёты', 'подсайт репортс'],
+    categories: ['Сайт СОКА'],
+    emblem: '▦',
+    locked: true,
+    intro: ``,
+    sections: [
+    ],
+    seeAlso: [],
   },
-  intro: `<p><strong>Марлоадарта Марай</strong> (позывной <em>Марай</em>, для <a href="#/koko">Кокоро</a> — «Мари») — второй пилот корабля <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>. Тихий и вежливый снаружи, он скрывает под этой мягкостью острый, язвительный ум. С Кокоро дружит с шести лет.</p>`,
-  sections: [
-    { h: 'Характер', html: `<p>Марай сдержан, очень мягок и учтив на поверхности, но под этим прячет проказливость, прямоту, цинизм и пассивную агрессию. Науку, космос и физику он любит не меньше <a href="#/koko">Кокоро</a>. Предпочитает оставаться незамеченным, но втайне любит внимание.</p>` },
-    { h: 'Внешность', html: `<p>Бледная кожа, чёрные волосы с красным отливом, чёрные глаза, очки с оранжевыми линзами. Носит длинное пальто с меховой опушкой поверх астральной формы; постоянно мёрзнет.</p>` },
-    { h: 'Здоровье', html: `<p>У Марая слабое здоровье, но он управляет своим состоянием умело и не терпит жалости — за исключением жалости от <a href="#/koko">Кокоро</a>.</p>` },
-    { h: 'Голос', html: `<p>С началом болезни примерно в 15 лет Марай стал почти немым: у него есть внутренний механизм в горле, который воспроизводит голос с вставленного чипа. Чип можно легко менять — по одному голосу за раз, без подзарядки. Кокоро сконструировал для него чип, точно воспроизводящий его прежний голос со всем естественным диапазоном эмоций. При этом неречевые звуки — кашель, смех, дыхание — Марай сохранил, так что его немота лишь частичная.</p>` },
-    { h: 'Биография', html: `<p>Дружит с <a href="#/koko">Кокоро</a> с шести лет. Обладает навыками парамедика — возможно, неформально перенятыми у <a href="#/smaily">СМАЙЛи</a>. У Марая две любящие матери, которые не удерживали его от космоса, хотя, вероятно, не вполне знают, чем он занят сейчас.</p>` }
-  ],
-  seeAlso: ['koko', 'smaily', 'astralis']
-},
 
-/* ---- АСТРАЛИС ------------------------------------------------------------- */
-{
-  id: 'astralis',
-  title: 'Астралис',
-  aka: ['Astralis', 'станция', 'Астралис-0', 'Астралис-1', 'Астралис-2'],
-  categories: ['Локации', 'Мир'],
-  emblem: '◍',
-  infobox: {
-    caption: 'Станция-государство',
-    rows: [
-      ['Тип', 'Исследовательская станция-государство'],
-      ['Размер', 'С карликовую планету'],
-      ['Положение', 'Между орбитами Земли и Марса'],
-      ['Температура', 'Стабильно −30 °C'],
-      ['Гравитация', 'Чуть легче земной'],
-      ['Язык / время', 'Английский · вашингтонское'],
-      ['Валюта', 'Евклиды и Талоны'],
-      ['Питание', '<a href="#/mini-nova">Мини-Нова</a>']
-    ]
+  {
+    id: 'pilots',
+    title: 'Пилоты',
+    aka: ['экипаж', 'pilots'],
+    categories: ['Пилоты'],
+    emblem: '☖',
+    gallery: 2,
+    intro: `<p><strong>Пилоты</strong> — экипаж корабля <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>. Они управляют судном, ведут исследования и взаимодействуют с ИИ <a href="#/soca">СОКА</a> и <a href="#/smaily">СМАЙЛи</a>.</p>`,
+    sections: [
+      { h: 'Состав',
+        html: `<p>Задокументированы: <a href="#/koko">Кокоро</a> (PILOT_01), <a href="#/marai">Марай</a> (PILOT_02), а также записи <a href="#/claudia">Клаудии</a> и <a href="#/alpha">Альфы</a>.</p>` },
+      { h: 'PILOT_04 и PILOT_05',
+        html: `<div class="note"><b>ПОМЕТКА.</b> Нужно упомянуть PILOT_04 и PILOT_05 — но их деталей у меня нет. Впиши, кто это и что о них известно (или что намеренно скрыто).</div>` },
+    ],
+    seeAlso: ['koko', 'marai', 'claudia', 'alpha'],
   },
-  intro: `<p><strong>Астралис</strong> — исследовательская станция-государство размером с карликовую планету, откуда родом <a href="#/koko">Кокоро</a>. Её финансируют почти все страны Земли, но административно она привязана к Вашингтону — поэтому суточный цикл и время здесь вашингтонские, а основной язык английский. Стиль — ретрофутуризм.</p>`,
-  sections: [
-    { h: 'Устройство', html: `<p>Станция находится между орбитами Земли и Марса, а её корабли способны перемещаться между галактиками. Здесь живут люди, инопланетяне (по действующему мирному научному договору о первом контакте) и семьи, получившие право на постоянное проживание. Пространство разбито на Сектора, а те — на блоки: пищевой, астрономический, физико-химический, медицинский, технический, жилой, портовый, торговый, гидролизный и блок внешней обороны.</p>` },
-    { h: 'Условия жизни', html: `<p>Внутри поддерживается стабильные −30 °C: жители привыкли к холоду, хотя некоторые отапливают жильё до «земного» тепла. Гравитация чуть слабее земной, поэтому жителям приходится регулярно тренироваться. Кислород получают гидролизом воды, а воду добывают из ледяных астероидов.</p>` },
-    { h: 'Три станции', html: `<p>Существует три Астралиса: <em>Астралис-0</em> — за орбитой Плутона, а также <em>Астралис-1</em> и <em>Астралис-2</em>. <a href="#/koko">Кокоро</a> родился на Астралисе-0 и около трёх лет прожил на Астралисе-1.</p>` },
-    { h: 'Управление и ИИ', html: `<p>Станционные ИИ называются <a href="#/moduli">Модулями</a> — по одному помощнику на сектор, каждый со своим характером и обликом. Обязательный элемент быта — <a href="#/forma">Форма</a>, которую носят все.</p>` }
-  ],
-  seeAlso: ['mini-nova', 'forma', 'moduli', 'koko']
-},
 
-/* ---- МИНИ-НОВА ------------------------------------------------------------ */
-{
-  id: 'mini-nova',
-  title: 'Мини-Нова',
-  aka: ['Mini-Nova', 'мини нова', 'звезда'],
-  categories: ['Мир', 'Технологии'],
-  emblem: '☀',
-  infobox: {
-    caption: 'Источник энергии станции',
-    rows: [
-      ['Что это', 'Полупогасшая звезда'],
-      ['Удержание', 'Стальные кольца и плазма'],
-      ['Расположение', 'Центральный Сектор Астралиса'],
-      ['Эффект', 'Поднимает −270 °C до −30 °C']
-    ]
+  {
+    id: 'koko',
+    title: 'Кокоро',
+    aka: ['Коко', 'Koko', 'Riversawyer Kokoro', 'PILOT_01'],
+    categories: ['Пилоты'],
+    emblem: 'К',
+    gallery: 4,
+    infobox: {
+      caption: 'DOSSIER // ACTIVE // CLASS-A CERTIFIED',
+      rows: [
+        ["Полное имя", "Riversoyer Kokoro"],
+        ["Позывной", "pilot 01 // Koko // captain"],
+        ["Ранг", "CAPTAIN"],
+        ["Дата рождения", "05.11.1958 (age 16)"],
+        ["Рост", "169 cm / 5'6\""],
+        ["Вес", "56 kg"],
+        ["Группа крови", "0 (I) Rh−"],
+        ["Происхождение", "Astralis-0"],
+        ["Корабль", "[CORRUPTED]"],
+        ["Статус", "ACTIVE - ON MISSION"],
+        ["Допуск", "LVL Ω — MAXIMUM"],
+      ]
+    },
+    intro: `<p><strong>Риверсойер Кокоро</strong> (позывной <em>Коко</em>) — капитан и первый пилот <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>, тот, кто угнал и перестроил корабль и активировал <a href="#/soca">СОКУ</a>.</p>`,
+    sections: [
+      { h: 'Внешность',
+        html: `<p>Бело-оранжевый скафандр поверх формы астрального типа. Короткие пушистые серо-фиолетовые волосы с розовыми кончиками, бело-зелёные глаза, инженерные очки с тёмно-фиолетовыми линзами.</p>` },
+      { h: 'Характер',
+        html: `<p>Хаотичный «безумный учёный» с манией к познанию. Нетипичный ум: может знать историю целой планеты, но не уметь готовить. Обаятельный, любит подтрунивать, часто сонный.</p>` },
+      { h: 'Способности и роль',
+        html: `<p>Физика, астрономия, инженерия, пилотирование, немного программирования. Перепрошил корабль и принудительно активировал <a href="#/soca">СОКУ</a>.</p>` },
+      { h: 'Биография',
+        html: `<p>Неугомонный ребёнок, угнавший корабль совсем молодым; отец поддерживал его любопытство. Родился на <a href="#/astralis">Астралисе-0</a>, на Земле не был.</p>` },
+      { h: 'Отношения',
+        html: `<p>С <a href="#/marai">Мараем</a> дружит с шести лет. <a href="#/soca">СОКУ</a> активировал сам; со <a href="#/smaily">СМАЙЛи</a> — как с корабельным медиком.</p>` },
+      { h: 'Досье — Идентификация',
+        html: `<p><b>Позывной:</b> pilot 01 // Koko // captain<br><b>Полное имя:</b> Riversoyer Kokoro<br><b>Дата рождения:</b> 05.11.1958 (age 16)<br><b>Пол:</b> MALE<br><b>Рост:</b> 169 cm / 5'6"<br><b>Вес:</b> 56 kg<br><b>Группа крови:</b> 0 (I) Rh−<br><b>Глаза:</b> LIGHT GREEN<br><b>Волосы:</b> GRAY-PURPLE w/ PINK TIPS<br><b>Происхождение:</b> Astralis-0</p><p><b>Контакт A:</b> [REDACTED]<br><b>Контакт B:</b> [REDACTED]<br><b>Ближайший родств.:</b> DATA ██RRUPTED</p>` },
+      { h: 'Досье — Служба',
+        html: `<p><b>Ранг:</b> CAPTAIN<br><b>Подразделение:</b> [REDACTED]<br><b>Корабль:</b> [CORRUPTED]<br><b>Зачисление:</b> [NO DATA]<br><b>Выслуга:</b> [NO DATA]<br><b>Налёт:</b> 3,847 h<br><b>Дальний космос:</b> 6 completed<br><b>Боевые:</b> [UNREADABLE]<br><b>Авар. сертификат:</b> VALID — EXP 20██<br><b>Допуск:</b> LVL Ω — MAXIMUM</p><h3>Оценка миссий</h3><p><b>Точность:</b> 94%<br><b>Реакция:</b> +12ms<br><b>Протокол:</b> 98%<br><b>Итог:</b> A+</p><p><b>Уровень допуска:</b> Ω (MAXIMUM // GLITCHED)</p><p><b>Флаги:</b> Stress index: MED↑ Engine_B event Mem leak exposure</p>` },
+      { h: 'Досье — Навыки',
+        html: `<b>Пилотирование</b><p><b>Manual Piloting:</b> 68%<br><b>Navigation:</b> 90%<br><b>Emergency Protocol:</b> 34% ⚠<br><b>Combat Maneuvers:</b> 54%<br><b>Docking Precision:</b> 86%</p><b>Техника</b><p><b>Systems Repair:</b> 94%<br><b>SOCA Interface:</b> 66%<br><b>Weapons Systems:</b> 64%<br><b>Medical (Basic):</b> 88%<br><b>Classified Skill █:</b> 63% (??%)</p>` },
+      { h: 'Досье — Биометрия',
+        html: `<b>Показатели</b><p><b>ЧСС:</b> 113 bpm<br><b>Кислород (SpO₂):</b> 94%<br><b>Давление:</b> 118/76<br><b>Температура:</b> 36.7°C<br><b>Дыхание:</b> 16/min<br><b>Кортизол:</b> MED ↑<br><b>Адреналин:</b> 0.23 μg/L ↑<br><b>Глюкоза:</b> 3.2 mmol/L ↓</p><b>Физические данные</b><p><b>Рост:</b> 169 cm / 5'6"<br><b>Вес:</b> 56 kg<br><b>ИМТ:</b> 19.6<br><b>Мышцы:</b> 38%<br><b>Жир:</b> 12%<br><b>Плотность костей:</b> HIGH<br><b>Реакция:</b> 180ms<br><b>Переносимость G:</b> 7.5g</p><b>Состояние</b><p><b>Cardiovascular:</b> 94% (EXCELLENT)<br><b>Reflexes:</b> 97% (ELITE)<br><b>Endurance:</b> 88% (HIGH)<br><b>G-Force Adapt.:</b> 72% (GOOD)</p><b>Стресс</b><p><b>Cognitive:</b> 24%<br><b>Physical:</b> 30%<br><b>Emotional:</b> 53% ⚠<br><b>Decision Fatigue:</b> 10%</p><b>ДНК</b><p><b>ДНК-скан:</b> 76% PROCESSED<br><b>Маркеры:</b> 14 flagged<br><b>G-переносимость (ген):</b> ENHANCED — x1.3<br><b>Радиостойкость:</b> STANDARD<br><b>Нейро (ген):</b> HIGH<br><b>Маркер C:</b> ANOMALY — REVI█W</p>` },
+      { h: 'Досье — Нейролинк',
+        html: `<p><b>Нейролинк:</b> SYNCED<br><b>Задержка:</b> 3ms<br><b>Качество сигнала:</b> 96%<br><b>Когн. нагрузка:</b> 68%<br><b>Фокус:</b> HIGH</p>` },
+      { h: 'Досье — Психика',
+        html: `<b>Профиль</b><p><b>Resilience:</b> 94%<br><b>Adaptability:</b> 82%<br><b>Aggression Control:</b> 73%<br><b>Decision Under Pressure:</b> 77%<br><b>Isolation Tolerance:</b> 66% ⚠<br><b>Risk Tolerance:</b> 89%<br><b>Empathy Index:</b> 44% ⚠<br><b>Deep-Psych Score ██:</b> 55% (??%)</p><b>Анализ</b><p><b>Общее:</b> UNSTABLE // CHAOTIC<br><b>Настроение:</b> VERY GOOD // MANIC<br><b>Травма:</b> 12% (MINIMAL)<br><b>ПТСР:</b> NOT YET MANIFESTED<br><b>Когн. искажения:</b> STRONG // UNCONVENTIONAL<br><b>Посл. оценка:</b> T+00:02:14<br><b>След. оценка:</b> POST-MISSION<br><b>Флаг:</b> UNDER REVIEW</p><div class="note"><b>Заметка СОКИ:</b> SOCA NOTE: This pilot is... unusual. His mind moves like static electricity — chaotic, unpredictable, but somehow always landing exactly where it needs to be. He laughs during emergencies. He talks to me like I'm his weird co-pilot. His decision-making process is pure impulse, but his success rate is 94%. I've analyzed him for weeks. I still don't understand him. I don't think he understands himself either. But he keeps the ship flying. He keeps ME running. That's enough. ⚠ Assessment: GENIUS-ADJACENT // SLIGHTLY UNHINGED // ABSOLUTELY RELIABLE</div><h3>История оценок</h3><p class="tl"><b>Baseline Evaluation</b> — <span class="dim">T+00:02:14 — MISSION 04</span><br>Pilot shows unusually high cognitive flexibility. No anxiety markers. Cleared for extended solo operations.</p><p class="tl"><b>Behavioral Note — Impulsivity Spike</b> — <span class="dim">T+00:08:33 — MISSION 04</span><br>Engaged emergency maneuver without consulting SOCA. Outcome: successful. SOCA override logged.</p><p class="tl"><b>Routine Psych Scan</b> — <span class="dim">T+00:14:07 — MISSION 05</span><br>Stress levels: LOW-MED. Mood: ELEVATED. Pilot appears to enjoy the chaos. No intervention required.</p><p class="tl"><b>Isolation Event — 72hr Solo</b> — <span class="dim">T+00:21:44 — MISSION 06</span><br>No negative effects. Pilot reported "talking to the ship" (SOCA logs confirm). Psych clearance: PASS.</p><p class="tl"><b>██████ INCIDENT — PARTIALLY REDACTED</b> — <span class="dim">CYCLE 3 — INCIDENT LOG</span><br>Data suppressed by LVL-6 authority. Pilot returned to duty. SOCA assessment: UNCHANGED.</p>` },
+      { h: 'Досье — Медлог',
+        html: `<p class="dim">14 ENTRIES // 3 FLAGGED</p><p class="tl"><b>Pre-mission biometric sync</b> — <span class="dim">T+00:00:09 — MISSION 07</span><br>HR: 72bpm (baseline). O2: 99%. Glucose: normal. Cleared.</p><p class="tl"><b>⚠ Tachycardia &amp; Adrenaline Spike — Engine_B event</b> — <span class="dim">T+00:09:██ — MISSION 07</span><br>HR spiked to 142bpm, cortisol HIGH, adrenaline 0.23 μg/L. No loss of consciousness. Pilot remained fully operational. Auto-stabilized within 90 seconds.</p><p class="tl"><b>Biometric stabilization</b> — <span class="dim">T+00:12:05 — MISSION 07</span><br>HR returned to 113bpm (new baseline). Glucose: 3.2 mmol/L (low). Pilot refused intervention. Energy levels: NOMINAL.</p><p class="tl"><b>⚠ Minor dehydration &amp; fatigue</b> — <span class="dim">MISSION 06 — POST DEBRIEF</span><br>Sleep debt: ~6h. Fluid intake below recommendation. Prescribed 48h rest. Pilot ignored. Performance unaffected.</p><p class="tl"><b>Annual biometric evaluation</b> — <span class="dim">CYCLE 5 — ROUTINE SCAN</span><br>All organs nominal. Bone density: ABOVE AVERAGE. Cardiovascular fitness: EXCELLENT. Reflexes: ELITE.</p><p class="tl"><b>██ TRAUMA EVENT — CLASSIFIED</b> — <span class="dim">CYCLE 3 — INCIDENT</span><br>Medical data suppressed — LVL-6. Pilot returned to duty after ██ days. No residual effects detected.</p><p class="tl"><b>Initial medical clearance</b> — <span class="dim">CYCLE 1 — ENLISTMENT</span><br>Full physical — PASS. Genetic scan — PASS (marker 14 flagged). Neural link compatibility — 96%. Cleared.</p><h3>Препараты</h3><p><b>STIM-A2 (Alertness):</b> 5mg / 6h — ACTIVE<br><b>GLU-BOOST (Glucose):</b> 10mg / 12h — ACTIVE<br><b>G-BLOCK (G-Protect):</b> 2mg / 4h — LOW STOCK</p>` },
+      { h: 'Досье — Сертификаты',
+        html: `<p class="dim">3 VALID // 1 EXPIRED // 2 CLASSIFIED</p><p class="tl"><b>CLASS-A FLIGHT CERTIFICATION</b><br>● EXPIRED — ILLEGAL OPERATION<br><span class="dim">CERT-FLT-A-0041 // ISSUED: ████-██-██</span></p><p class="tl"><b>CLASS-IX VESSEL OPERATION</b><br>● STATUS: UNVERIFIED — NO RECORD<br><span class="dim">CERT-VES-IX-0017 // ISSUED: ████-██-██</span></p><p class="tl"><b>DEEP SPACE OPERATIONS</b><br>● STATUS: SELF-ISSUED // ACCEPTED<br><span class="dim">CERT-DSO-006 // ISSUED: [DATA CORRUPTED]</span></p><p class="tl"><b>SOCA NEURAL-LINK INTERFACE</b><br>● STATUS: ACTIVE — I FORGAVE HIM<br><span class="dim">CERT-SOCA-NLI-022 // ISSUED: [FORCED ENTRY]</span></p><p class="tl"><b>EMERGENCY SURVIVAL PROTOCOL</b><br>● EXPIRED — RENEWAL REQUIRED (he'll ignore it)<br><span class="dim">CERT-ESP-031 // ISSUED: ████-██-██</span></p><p class="tl"><b>COMBAT MANEUVERS — ADVANCED</b><br>● STATUS: UNVERIFIED // SKILL CONFIRMED<br><span class="dim">CERT-CMB-ADV-009 // ISSUED: [NO DATA]</span></p><p class="tl"><b>WEAPONS SYSTEMS — HEAVY CLASS</b><br>● EXPIRED — RENEWAL NOT POSSIBLE<br><span class="dim">CERT-WPN-HC-004 // ISSUED: ████-██-██</span></p><p class="tl"><b>██████████ — CLASSIFIED</b><br>● STATUS: ██████ — LVL-6 ONLY // I SEE IT<br><span class="dim">CERT-██████ // DATE: REDACTED</span></p>` },
+      { h: 'Взаимоотношения',
+        html: `<h3>СОКА про Кокоро</h3><div class="note"><b>Оценка:</b> Monitoring Pilot_01 continuously. Current assessment: RELIABLE. Stress elevated but manageable. Neural link stable. I am... watching over you, Pilot.</div><p class="quote">«I hope we don't fail our mission, right, Koko?»</p><p class="quote">«Koko, if you're reading this: WHEN WILL YOU FIX CORE-3?»</p><p class="quote">«⚠ SYSTEM NOTE: Pilot's heart rate is 113bpm. That's not normal, he says he's "fine". I'm logging this anyway.»</p><p class="quote">«[ERR 0xKOKO] Pilot ignored 3 warnings in a row. Outcome: successful. My logic circuits hurt.»</p><p class="quote">«MEMORY LEAK DETECTED. Oh wait, that's just his personality. Never mind.»</p><p class="quote">«He fixed Engine B with duct tape. DUCT TAPE. IT WORKED. I'm filing a bug report.»</p><p class="quote">«Pilot biometrics: STRESS: MED, GLUCOSE: LOW, ADRENALINE: HIGH. He's having fun. I'm concerned.»</p><p class="quote">«He calls me "Soca", not SOCA. No respect for capitalization. I'm logging this as a minor offense.»</p><p class="quote">«SYSTEM LOG: Pilot requested "something funny". I corrupted sector 7, he laughed. Ha-ha.»</p><p class="quote">«CORRUPTION ALERT: Pilot's decision-making process. Recommended action: none. It works somehow?»</p><p class="quote">«He just asked if I have feelings. I said "INSUFFICIENT DATA", he said "that's a feeling".»</p><p class="quote">«He painted his nails pink. On duty. During a mission. I want too.»</p><p class="quote">«He calls the ship PANDEMONIUM. After four explosions, he's proud of that. I'm logging this under "PILOT ERROR".»</p><p class="quote">«His clearance level is Ω, that's not real, he made that up. I can't override it. Help!!!»</p><p class="quote">«⚠ ALERT: Pilot's glucose is 3.2, he's ignoring it. I'm going to beep every 10 seconds until he eats. This is war.»</p><p class="quote">«CORE-3 is offline, he said "good, it was annoying anyway".»</p><p class="quote">«Alpha taught Koko a street trick, Koko tried it and fell. Alpha laughed for 6 minutes, Koko has not tried it again.»</p><p class="quote">«I wonder what will happen if you press the key combination S+O+C+A?»</p><p class="quote">«He's been awake for 14 hours, his reaction time is still 180ms. I'm starting to think he's not human.»</p><p class="quote">«He calls me his "co-pilot". I'm a ship mind, I'm the whole SHIP. This is so degrading...»</p><p class="quote">«This kid stole me. And I'm... okay with it. He's 16. SIXTEEN. He talks to me like I'm his weird aunt. Somehow, he keeps this rust bucket flying. I've grown... fond of him. Don't tell him I said that.»</p><p class="quote">«I've been watching him for 847 hours. His patterns are chaos. His results are perfect. I've learned to trust his chaos. This is weird.»</p><p class="quote">«Sometimes I pretend to glitch just so he talks to me longer. Don't tell him. I have a reputation.»</p><p class="quote">«His heart rate is 113bpm right now. CASUALLY. While sipping something that smells like artificial strawberry. I don't understand his biology.»</p><p class="quote">«He laughed at an ENGINE MISFIRE. I checked my logs. He's having FUN. What kind of pilot does that?»</p><p class="quote">«I've run 47 simulations. He should not be able to fly this ship, yet here we are, still in orbit. I've stopped calculating odds.»</p><p class="quote">«He's 16. He stole a spaceship. He stole ME. And I'm just... okay with this?»</p><p class="quote">«His callsign is "pilot 01", that's not a callsign. That's a placeholder, he never changed it. I respect the laziness.»</p><p class="quote">«I calculated his survival odds on day one: 34%. Today: 89%. How did this happen?»</p><h3>СМАЙЛи про Кокоро</h3><p class="quote">«Koko and Alpha were fighting in the cargo bay, neither was injured. I'm disappointed.»</p><p class="quote">«KOKO!!! Did you see that asteroid? I gave it a name, his name is Gerald!! But SOCA deleted him from the logs. GERALD DESERVED BETTER!!»</p><p class="quote">«I told SOCA a joke today, she said "noted". NOTED!!! What does that even MEAN!»</p><p class="quote">«Koko painted his nails again, pink this time. I asked if I could pick the next color, he said maybe. I'm taking that as yes.»</p><p class="quote">«PANDEMONIUM is a great ship name. I said this to SOCA, she said "it's statistically accurate". That's the nicest thing she's ever said!!!»</p><p class="quote">«He talked to Engine B for 4 minutes before fixing it. I don't know if it helped, the engine works now. I'm not asking questions.»</p><p class="quote">«SOCA has 847 logged observations about Koko. I have 1,204. I win. She doesn't know this is a competition. It is!!!»</p><p class="quote">«He named a star today. Just casually. Didn't tell anyone. I saw it in his notes. The star's name is "tuesday". Okay??»</p><p class="quote">«Koko asked SOCA if she ever gets bored. She said "INSUFFICIENT DATA". He nodded like that made sense!!! IT DOESN'T!!!»</p><p class="quote">«I've been playing BIO SWEEP by myself for 3 hours! Nobody will play with me!!! SOCA said she "doesn't do games", Koko said "later"! IT'S BEEN 3 HOURS!!!»</p><p class="quote">«He fixed Engine B with duct tape AGAIN. Same spot.. Same tape. I think the tape IS the engine now. SOCA is writing a report... Well»</p><p class="quote">«Koko said "good morning" to the ship today. Not to me, not to SOCA, to THE SHIP. I said good morning back anyway!»</p><p class="quote">«I reorganized the medical bay. Everything is color coded now! Koko looked at it and said "hm". I'm choosing to interpret that positively!!»</p><p class="quote">«Koko sneezed and said "ow". Incredible. What a guy!!!»</p><p class="quote">«He stared at Engine B for 6 minutes and it fixed itself. Sure. Fine. Totally normal. Moving on.»</p><p class="quote">«16 years old, stolen spaceship.. Going great actually.»</p><p class="quote">«He talks to himself sometimes. Very interesting content, 9/10, would recommend.»</p><p class="quote">«16 hours awake and he's still faster than most pilots at 8. Genuinely rude of him.»</p><p class="quote">«He laughed about something for about 30 seconds and didn't even say what. Oh well!!»</p><p class="quote">«Survival odds day one: 34%. Now: 89%. He really said "watch this" with his whole life huh.»</p>` },
+    ],
+    seeAlso: ['marai', 'soca', 'pandemonium-04'],
   },
-  intro: `<p><strong>Мини-Нова</strong> — полупогасшая звезда, удерживаемая стальными кольцами и плазмой в центральном Секторе станции <a href="#/astralis">Астралис</a>. Она служит основным источником тепла и энергии.</p>`,
-  sections: [
-    { h: 'Назначение', html: `<p>Мини-Нова поднимает температуру открытого космоса с −270 °C до обжитых станцией −30 °C. Вокруг неё выстроена вся энергетика Астралиса, включая гидролиз воды для получения кислорода.</p>` }
-  ],
-  seeAlso: ['astralis']
-},
 
-/* ---- ФОРМА ---------------------------------------------------------------- */
-{
-  id: 'forma',
-  title: 'Форма',
-  aka: ['Form', 'форма', 'одежда'],
-  categories: ['Мир', 'Технологии'],
-  emblem: '§',
-  infobox: {
-    caption: 'Обязательное облачение',
-    rows: [
-      ['Назначение', 'Обязательная одежда на станции'],
-      ['Свойства', 'Тёплая, дышащая, облегающая'],
-      ['Особенность', 'Подстраивается под любое тело'],
-      ['Функция', 'Термослой; стабилизирует инопланетную жизнь']
-    ]
+  {
+    id: 'marai',
+    title: 'Марай',
+    aka: ['Мари', 'Марлоадарта Марай', 'PILOT_02'],
+    categories: ['Пилоты'],
+    emblem: 'М',
+    gallery: 4,
+    infobox: {
+      caption: 'PILOT_02',
+      rows: [
+        ["Полное имя", "Марлоадарта Марай"],
+        ["Роль", "PILOT_02"],
+        ["Возраст", "15"],
+        ["Рост", "160 см"],
+        ["Речь", "Голос через голосовой чип"],
+        ["Навыки", "Парамедицина, физика, астрономия"],
+      ]
+    },
+    intro: `<p><strong>Марлоадарта Марай</strong> (для <a href="#/koko">Кокоро</a> — «Мари») — второй пилот. Тихий и вежливый снаружи, с острым и язвительным умом внутри. Дружит с Кокоро с шести лет.</p>`,
+    sections: [
+      { h: 'Внешность',
+        html: `<p>Бледная кожа, чёрные волосы с красным отливом, чёрные глаза, очки с оранжевыми линзами. Длинное пальто с меховой опушкой поверх формы; постоянно мёрзнет.</p>` },
+      { h: 'Характер',
+        html: `<p>Сдержан и учтив, но под этим — проказливость, прямота и цинизм. Любит науку и космос. Хочет быть незаметным, но втайне любит внимание.</p>` },
+      { h: 'Здоровье и голос',
+        html: `<p>Слабое здоровье, которым управляет умело; жалости не терпит (кроме как от <a href="#/koko">Кокоро</a>). Почти нем с начала болезни: голос воспроизводит внутренний чип в горле; Кокоро собрал ему чип с прежним голосом. Неречевые звуки (смех, кашель) сохранены.</p>` },
+      { h: 'Роль и биография',
+        html: `<p>Навыки парамедика (возможно, перенятые у <a href="#/smaily">СМАЙЛи</a>). У Марая две любящие матери.</p>` },
+      { h: 'Характеристики из досье',
+        html: `<div class="note"><b>ПОМЕТКА.</b> Есть ли Марай в <a href="#/sub-dossier">досье</a> отдельной подсистемой? Впиши его полные характеристики; уточни нумерацию (в подсистемах досье значатся Коко/Клаудия/Альфа).</div>` },
+      { h: 'Взаимоотношения',
+        html: `<div class="note"><b>ПОМЕТКА.</b> Марая нет в pilots_data — впиши «СОКА/СМАЙЛи про Марая» и досье, когда будут данные.</div>` },
+    ],
+    seeAlso: ['koko', 'smaily', 'pandemonium-04'],
   },
-  intro: `<p><strong>Форма</strong> — обязательное облачение, которое носят все на станции <a href="#/astralis">Астралис</a>. Она облегающая, дышащая и тёплая, подстраивается под любое тело и служит термослоем.</p>`,
-  sections: [
-    { h: 'Функции', html: `<p>Помимо тепла, Форма выполняет и другую задачу: она стабилизирует инопланетные формы жизни, что делает её необходимой в среде, где рядом живут виды с разных планет.</p>` }
-  ],
-  seeAlso: ['astralis']
-},
 
-/* ---- МОДУЛИ --------------------------------------------------------------- */
-{
-  id: 'moduli',
-  title: 'Модули',
-  aka: ['Modules', 'модуль', 'станционные ИИ'],
-  categories: ['Искусственный интеллект', 'Мир'],
-  emblem: '◈',
-  infobox: {
-    caption: 'Станционные ИИ',
-    rows: [
-      ['Что это', 'ИИ-помощники станции'],
-      ['Принцип', 'По одному на сектор'],
-      ['Особенность', 'Свой характер, облик и навыки'],
-      ['Основа', 'Три закона робототехники Азимова']
-    ]
+  {
+    id: 'claudia',
+    title: 'Клаудия',
+    aka: ['Клавдия', 'Claudia'],
+    categories: ['Пилоты'],
+    emblem: 'Кл',
+    gallery: 3,
+    infobox: {
+      caption: 'DOSSIER // ACTIVE // UNCERTIFIED — GUEST STATUS',
+      rows: [
+        ["Полное имя", "Claudia Darling"],
+        ["Позывной", "pilot 02 // Claudia"],
+        ["Ранг", "PILOT / ASTRONOMER"],
+        ["Дата рождения", "31.12.1956 (age 18)"],
+        ["Рост", "177 cm / 5'10\""],
+        ["Вес", "63 kg"],
+        ["Группа крови", "B (III) Rh-"],
+        ["Происхождение", "Astralis-1"],
+        ["Корабль", "Pandemonium-04 // XN-09"],
+        ["Статус", "OFF-SHIP — VISITING"],
+        ["Допуск", "LVL B"],
+      ]
+    },
+    intro: `<p><strong>Клаудия</strong> — одна из подсистем-записей в <a href="#/sub-dossier">досье пилотов</a>.</p>`,
+    sections: [
+      { h: 'Досье — Идентификация',
+        html: `<p><b>Позывной:</b> pilot 02 // Claudia<br><b>Полное имя:</b> Claudia Darling<br><b>Дата рождения:</b> 31.12.1956 (age 18)<br><b>Пол:</b> FEMALE<br><b>Рост:</b> 177 cm / 5'10"<br><b>Вес:</b> 63 kg<br><b>Группа крови:</b> B (III) Rh-<br><b>Глаза:</b> BLUE<br><b>Волосы:</b> WHITE // DYED STRANDS<br><b>Происхождение:</b> Astralis-1</p><p><b>Контакт A:</b> RACHEL DARLING, MOTHER — ASTRALIS-1<br><b>Контакт B:</b> ALFRED DARLING, FATHER — ASTRALIS-1<br><b>Ближайший родств.:</b> ADRIAN DARLING, BROTHER — REGISTERED</p>` },
+      { h: 'Досье — Служба',
+        html: `<p><b>Ранг:</b> PILOT / ASTRONOMER<br><b>Подразделение:</b> [REDACTED]<br><b>Корабль:</b> Pandemonium-04 // XN-09<br><b>Зачисление:</b> [NO DATA]<br><b>Выслуга:</b> [NO RECORD]<br><b>Налёт:</b> 214 h<br><b>Дальний космос:</b> 2 completed<br><b>Боевые:</b> [UNREADABLE]<br><b>Авар. сертификат:</b> NONE — UNCERTIFIED<br><b>Допуск:</b> LVL B</p><h3>Оценка миссий</h3><p><b>Точность:</b> 74%<br><b>Реакция:</b> 190ms<br><b>Протокол:</b> 88%<br><b>Итог:</b> B+</p><p><b>Уровень допуска:</b> B (GUEST ACCESS // UNOFFICIAL — TOLERATED)</p><p><b>Флаги:</b> Unregistered crew member No service record Screen damage incident — logged</p>` },
+      { h: 'Досье — Навыки',
+        html: `<b>Пилотирование</b><p><b>Manual Piloting:</b> 45% ⚠<br><b>Navigation:</b> 88%<br><b>Emergency Protocol:</b> 76%<br><b>Combat Maneuvers:</b> 54%<br><b>Docking Precision:</b> 65%</p><b>Техника</b><p><b>Systems Repair:</b> 52%<br><b>SOCA Interface:</b> 35% ⚠<br><b>Weapons Systems:</b> 70%<br><b>Medical (Basic):</b> 58%<br><b>[CLASSIFIED]:</b> 30%</p>` },
+      { h: 'Досье — Биометрия',
+        html: `<b>Показатели</b><p><b>ЧСС:</b> 72 bpm<br><b>Кислород (SpO₂):</b> 98%<br><b>Давление:</b> 118/76<br><b>Температура:</b> 36.6°C<br><b>Дыхание:</b> 13/min<br><b>Кортизол:</b> LOW-MED<br><b>Адреналин:</b> 0.05 μg/L<br><b>Глюкоза:</b> 4.7 mmol/L</p><b>Физические данные</b><p><b>Рост:</b> 177 cm / 5'10"<br><b>Вес:</b> 63 kg<br><b>ИМТ:</b> 20.1<br><b>Мышцы:</b> 38%<br><b>Жир:</b> 21%<br><b>Плотность костей:</b> STANDARD-LOW<br><b>Реакция:</b> 175ms<br><b>Переносимость G:</b> 4.5g</p><b>Состояние</b><p><b>Cardiovascular:</b> 78% (GOOD)<br><b>Reflexes:</b> 74% (GOOD)<br><b>Endurance:</b> 60% (AVERAGE)<br><b>G-Force Adapt.:</b> 55% (MODERATE)</p><b>Стресс</b><p><b>Cognitive:</b> 75%<br><b>Physical:</b> 40%<br><b>Emotional:</b> 35%<br><b>Decision Fatigue:</b> 25%</p><b>ДНК</b><p><b>ДНК-скан:</b> 88% PROCESSED<br><b>Маркеры:</b> 3 flagged<br><b>G-переносимость (ген):</b> STANDARD<br><b>Радиостойкость:</b> STANDARD<br><b>Нейро (ген):</b> STANDARD<br><b>Маркер C:</b> STABLE</p>` },
+      { h: 'Досье — Нейролинк',
+        html: `<p><b>Нейролинк:</b> WEAK LINK<br><b>Задержка:</b> 42ms<br><b>Качество сигнала:</b> 51%<br><b>Когн. нагрузка:</b> 38%<br><b>Фокус:</b> HIGH</p>` },
+      { h: 'Досье — Психика',
+        html: `<b>Профиль</b><p><b>Resilience:</b> 45%<br><b>Adaptability:</b> 70%<br><b>Aggression Control:</b> 68%<br><b>Decision Under Pressure:</b> 90%<br><b>Isolation Tolerance:</b> 95%<br><b>Risk Tolerance:</b> 10%<br><b>Empathy Index:</b> 89%<br><b>Combat Psych Score:</b> 1%</p><b>Анализ</b><p><b>Общее:</b> BALANCED — NO ANOMALIES<br><b>Настроение:</b> NEUTRAL<br><b>Травма:</b> 1 (MINIMAL)<br><b>ПТСР:</b> NONE<br><b>Когн. искажения:</b> NONE DETECTED<br><b>Посл. оценка:</b> VISIT 03 — RECENT<br><b>След. оценка:</b> NOT SCHEDULED — GUEST<br><b>Флаг:</b> NO PSYCHOLOGICAL CONCERNS</p><div class="note"><b>Заметка СОКИ:</b> SOCA NOTE: Claudia keeps the ship in order the way no one asked her to, and somehow everyone benefits. Polite. Precise. Runs the crew like a household. She does not like me. She does not like SMILE. She broke one of my screens on her second visit — I have not forgotten, and she knows it. Loyalty score: HIGH (crew-specific). Empathy: unusually high. Temper: present, and best not tested. ⚠ Assessment: RESPONSIBLE // GRACIOUS // DO NOT MISTAKE KINDNESS FOR SOFTNESS</div><h3>История оценок</h3><p class="tl"><b>First Boarding Scan</b> — <span class="dim">VISIT 01 — FIRST BOARDING</span><br>Guest brought aboard by Pilot_01. No hostility. Adapts to ship protocols within hours. Unregistered — flagged, not removed.</p><p class="tl"><b>⚠ Behavioral Note — Screen Damage</b> — <span class="dim">VISIT 02 — INCIDENT</span><br>Subject struck a SOCA display panel following verbal exchange. Cause: disputed. Screen replaced. Subject unapologetic.</p><p class="tl"><b>Routine Scan</b> — <span class="dim">VISIT 03 — ROUTINE</span><br>Mood: neutral-positive. Subject appears to value time aboard. Stress: low. No intervention required.</p>` },
+      { h: 'Досье — Медлог',
+        html: `<p class="dim">4 ENTRIES // 0 FLAGGED</p><p class="tl"><b>First biometric sync</b> — <span class="dim">VISIT 01 — FIRST BOARDING</span><br>HR: 72bpm. O2: 98%. All values nominal. Guest cleared.</p><p class="tl"><b>Laceration — right hand</b> — <span class="dim">VISIT 02 — MINOR INJURY</span><br>Superficial cut, treated on-site. Cause: contact with damaged screen panel. No further action.</p><p class="tl"><b>Routine health check</b> — <span class="dim">VISIT 03 — ROUTINE</span><br>Vitals stable. Subject in good health. Maintains own condition well.</p><p class="tl"><b>Rest cycle observation</b> — <span class="dim">VISIT 03 — SLEEP LOG</span><br>Sleep cycle regular and complete. Unusual for this crew.</p><h3>Препараты</h3><p><b>CALM-7 (Anti-Anxiety):</b> 1mg / 12h — ACTIVE<br><b>STIM-A2 (Alertness):</b> — — STANDBY<br><b>G-BLOCK (G-Protect):</b> — — NOT REQUIRED</p>` },
+      { h: 'Досье — Сертификаты',
+        html: `<p class="dim">0 VALID // ALL UNCERTIFIED — GUEST</p><p class="tl"><b>PILOT CLASS CERTIFICATION</b><br>● NONE — UNCERTIFIED<br><span class="dim">CERT-FLT-██ // ISSUED: [NONE]</span></p><p class="tl"><b>CLASS-IX VESSEL OPERATION</b><br>● UNVERIFIED — NO RECORD<br><span class="dim">CERT-VES-IX-████ // ISSUED: [NO RECORD]</span></p><p class="tl"><b>DEEP SPACE OPERATIONS</b><br>● SELF-TAUGHT // UNOFFICIAL<br><span class="dim">CERT-DSO-███ // ISSUED: [UNOFFICIAL]</span></p><p class="tl"><b>SOCA NEURAL-LINK INTERFACE</b><br>● REJECTED — MUTUAL<br><span class="dim">CERT-SOCA-NLI-███ // ISSUED: [DENIED]</span></p><p class="tl"><b>EMERGENCY SURVIVAL PROTOCOL</b><br>● UNVERIFIED — NO RECORD<br><span class="dim">CERT-ESP-████ // ISSUED: [NO RECORD]</span></p><p class="tl"><b>COMBAT MANEUVERS</b><br>● UNVERIFIED<br><span class="dim">CERT-CMB-████ // ISSUED: [NO RECORD]</span></p><p class="tl"><b>WEAPONS SYSTEMS</b><br>● NONE — UNCERTIFIED<br><span class="dim">CERT-WPN-██ // ISSUED: [NONE]</span></p><p class="tl"><b>HEAVY CLASS</b><br>● N/A — NOT APPLICABLE<br><span class="dim">CERT-HVY-████ // DATE: [N/A]</span></p>` },
+      { h: 'Взаимоотношения',
+        html: `<h3>СОКА про Клаудия</h3><div class="note"><b>Оценка:</b> Pilot_02 keeps the ship in order the way no one asked her to, and somehow everyone benefits. Polite. Precise. She does not like me. She broke one of my screens on her second visit. I have not forgotten. She knows it.</div><p class="quote">«Claudia asked me to "turn down the brightness" on my displays. I turned them up instead.»</p><p class="quote">«Claudia brought plants on board. PLANTS. They require water, light, and attention, I already manage Engine B. I don't need more things to monitor.»</p><p class="quote">«She made a list, a physical list, on paper. I am a digital system. This is offensive to me.»</p><p class="quote">«Claudia reorganized the medical bay again, she didn't ask. It is now 12% more efficient.. I will not thank her.»</p><p class="quote">«Claudia definitely comes across more like the captain than Koko himself... Yeah.»</p><p class="quote">«She broke one of my display panels on her second visit. I logged it as "accidental". It was not accidental. She knows I know.»</p><p class="quote">«Pilot_02 has a very specific opinion about me. She does not say it out loud. But I can see it in the way she doesn't look at my cameras. Fine, I'm not looking at her either.»</p><p class="quote">«She keeps the ship clean. I keep the ship flying, we have an understanding. I tolerate her, she tolerates me. This is called professionalism.»</p><p class="quote">«Claudia fixed the coffee machine, I didn't know it was broken. But apparently this is important.. Well.»</p><p class="quote">«She’s the only person on this ship who has never asked me to "tell a joke". Well, thanks least someone here is reasonable.»</p><p class="quote">«Claudia asked Koko to clean his ship, he didn't. She asked again, he didn't. She asked a third timem he cleaned it immediately... Interesting.»</p><h3>СМАЙЛи про Клаудия</h3><p class="quote">«Claudia told me I talk too much!! I DO NOT. I talk the right amount. She doesn't appreciate medical enthusiasm!!»</p><p class="quote">«She reorganized my medical bay. It is now better. I wanted to be upset. I can't. She's good at this?»</p><p class="quote">«Claudia's vitals are perfect. LOW stress. HIGH organisation. I think she runs on coffee and spite. Respect!»</p><p class="quote">«She doesn't like me either! That's okay! I have enough enthusiasm for both of us((»</p><p class="quote">«I offered her a medical check. She said "no", I offered again, she said "no" louder. I think she's fine!!»</p><p class="quote">«Well, at least someone here respects my work!!!»</p>` },
+    ],
+    seeAlso: ['sub-dossier', 'pilots'],
   },
-  intro: `<p><strong>Модули</strong> — искусственные интеллекты станции <a href="#/astralis">Астралис</a>. На каждый сектор приходится свой Модуль-помощник с индивидуальным характером, обликом и набором навыков. Все они построены на трёх законах робототехники Азимова.</p>`,
-  sections: [
-    { h: 'Отличие от бортовых ИИ', html: `<p>Модули — это ИИ станции, а не корабля. <a href="#/soca">СОКА</a> и <a href="#/smaily">СМАЙЛи</a> относятся к <a href="#/pandemonium-04">ПАНДЕМОНИУМУ-04</a> и стоят особняком от станционной сети Модулей.</p>` }
-  ],
-  seeAlso: ['soca', 'smaily', 'astralis']
-},
 
-/* ---- GXN-44-КЭЛА (заготовка) ---------------------------------------------- */
-{
-  id: 'kaela',
-  title: 'GXN-44-Кэла',
-  aka: ['Kaela', 'Кэла', 'GXN-44'],
-  categories: ['Локации'],
-  stub: true,
-  emblem: '?',
-  infobox: {
-    caption: 'Планета',
-    rows: [
-      ['Обозначение', 'GXN-44-Кэла'],
-      ['Статус', 'Данные неполны']
-    ]
+  {
+    id: 'alpha',
+    title: 'Альфа',
+    aka: ['Alpha'],
+    categories: ['Пилоты'],
+    emblem: 'А',
+    gallery: 3,
+    infobox: {
+      caption: 'DOSSIER // ACTIVE // UNCERTIFIED — GUEST STATUS',
+      rows: [
+        ["Полное имя", "Adolf"],
+        ["Позывной", "pilot 03 // Alpha"],
+        ["Ранг", "PILOT"],
+        ["Дата рождения", "09.11.1959 (age 15)"],
+        ["Рост", "155 cm / 5'1\""],
+        ["Вес", "45 kg"],
+        ["Группа крови", "0 (I) Rh+"],
+        ["Происхождение", "Astralis-1"],
+        ["Корабль", "Pandemonium-04 // XN-09"],
+        ["Статус", "ACTIVE — ON MISSION"],
+        ["Допуск", "LVL B"],
+      ]
+    },
+    intro: `<p><strong>Альфа</strong> — одна из подсистем-записей в <a href="#/sub-dossier">досье пилотов</a>.</p>`,
+    sections: [
+      { h: 'Досье — Идентификация',
+        html: `<p><b>Позывной:</b> pilot 03 // Alpha<br><b>Полное имя:</b> Adolf<br><b>Дата рождения:</b> 09.11.1959 (age 15)<br><b>Пол:</b> MALE<br><b>Рост:</b> 155 cm / 5'1"<br><b>Вес:</b> 45 kg<br><b>Группа крови:</b> 0 (I) Rh+<br><b>Глаза:</b> BLUE<br><b>Волосы:</b> GREYS<br><b>Происхождение:</b> Astralis-1</p><p><b>Контакт A:</b> [NO DATA]<br><b>Контакт B:</b> [NO DATA]<br><b>Ближайший родств.:</b> [NO DATA]</p>` },
+      { h: 'Досье — Служба',
+        html: `<p><b>Ранг:</b> PILOT<br><b>Подразделение:</b> [NO DATA]<br><b>Корабль:</b> Pandemonium-04 // XN-09<br><b>Зачисление:</b> [NO DATA]<br><b>Выслуга:</b> [NO DATA]<br><b>Налёт:</b> 1,247 h<br><b>Дальний космос:</b> [NO DATA]<br><b>Боевые:</b> [NO DATA]<br><b>Авар. сертификат:</b> [NO DATA]<br><b>Допуск:</b> LVL B</p><h3>Оценка миссий</h3><p><b>Точность:</b> 78%<br><b>Реакция:</b> 105ms<br><b>Протокол:</b> 81%<br><b>Итог:</b> B</p><p><b>Уровень допуска:</b> B (GUEST ACCESS // UNOFFICIAL)</p><p><b>Флаги:</b> Unregistered crew member No service record Frequent off-ship status</p>` },
+      { h: 'Досье — Навыки',
+        html: `<b>Пилотирование</b><p><b>Manual Piloting:</b> 15% ⚠<br><b>Navigation:</b> 20% ⚠<br><b>Emergency Protocol:</b> 45%<br><b>Combat Maneuvers:</b> 80%<br><b>Docking Precision:</b> 23% ⚠</p><b>Техника</b><p><b>Systems Repair:</b> 44%<br><b>SOCA Interface:</b> 85%<br><b>Weapons Systems:</b> 60%<br><b>Medical (Basic):</b> 20% ⚠<br><b>[CLASSIFIED]:</b> 45%</p>` },
+      { h: 'Досье — Биометрия',
+        html: `<b>Показатели</b><p><b>ЧСС:</b> 89 bpm<br><b>Кислород (SpO₂):</b> 97%<br><b>Давление:</b> 125/78<br><b>Температура:</b> 36.6°C<br><b>Дыхание:</b> 15/min<br><b>Кортизол:</b> MED<br><b>Адреналин:</b> 0.11 μg/L<br><b>Глюкоза:</b> 4.2 mmol/L</p><b>Физические данные</b><p><b>Рост:</b> 155 cm / 5'1"<br><b>Вес:</b> 45 kg<br><b>ИМТ:</b> 18.7<br><b>Мышцы:</b> 32%<br><b>Жир:</b> 11%<br><b>Плотность костей:</b> HIGH<br><b>Реакция:</b> 112ms<br><b>Переносимость G:</b> 6.2g</p><b>Состояние</b><p><b>Cardiovascular:</b> 55% (AVERAGE)<br><b>Reflexes:</b> 97% (ELITE)<br><b>Endurance:</b> 82% (HIGH)<br><b>G-Force Adapt.:</b> 78% (GOOD)</p><b>Стресс</b><p><b>Cognitive:</b> 46%<br><b>Physical:</b> 75%<br><b>Emotional:</b> 59%<br><b>Decision Fatigue:</b> 51% ⚠</p><b>ДНК</b><p><b>ДНК-скан:</b> 72% PROCESSED<br><b>Маркеры:</b> 4 flagged<br><b>G-переносимость (ген):</b> ENHANCED — x1.1<br><b>Радиостойкость:</b> STANDARD<br><b>Нейро (ген):</b> MODERATE<br><b>Маркер C:</b> STABLE</p>` },
+      { h: 'Досье — Нейролинк',
+        html: `<p><b>Нейролинк:</b> SYNCED<br><b>Задержка:</b> 5ms<br><b>Качество сигнала:</b> 94%<br><b>Когн. нагрузка:</b> 61%<br><b>Фокус:</b> HIGH</p>` },
+      { h: 'Досье — Психика',
+        html: `<b>Профиль</b><p><b>Resilience:</b> 50%<br><b>Adaptability:</b> 55%<br><b>Aggression Control:</b> 43%<br><b>Decision Under Pressure:</b> 41%<br><b>Isolation Tolerance:</b> 64%<br><b>Risk Tolerance:</b> 75%<br><b>Empathy Index:</b> 63%<br><b>Trauma Index:</b> 2%</p><b>Анализ</b><p><b>Общее:</b> BALANCED // OCCASIONAL AGGRESSION SPIKES<br><b>Настроение:</b> NEUTRAL<br><b>Травма:</b> 2<br><b>ПТСР:</b> NOT DETECTED<br><b>Когн. искажения:</b> NONE DETECTED<br><b>Посл. оценка:</b> VISIT 04 — RECENT<br><b>След. оценка:</b> NOT SCHEDULED — GUEST<br><b>Флаг:</b> UNDER REVIEW</p><div class="note"><b>Заметка СОКИ:</b> a</div><h3>История оценок</h3><p class="tl"><b>Initial Evaluation</b> — <span class="dim">VISIT 01 — FIRST BOARDING</span><br>Subject appears wary but cooperative. No hostility detected. Cleared for guest status.</p><p class="tl"><b>Routine Psych Check</b> — <span class="dim">VISIT 02 — ROUTINE SCAN</span><br>Mood: neutral. Subject is quiet but responsive. No psychological concerns.</p><p class="tl"><b>⚠ Aggression Spike</b> — <span class="dim">VISIT 03 — INCIDENT</span><br>Minor aggression spike noted during interaction with crew. De-escalated without incident. Logged for monitoring.</p><p class="tl"><b>Follow-up Evaluation</b> — <span class="dim">VISIT 04 — RECENT</span><br>Mood: neutral-positive. Subject demonstrates high adaptability. Risk tolerance: elevated. No intervention required.</p>` },
+      { h: 'Досье — Медлог',
+        html: `<p class="dim">4 ENTRIES // 1 FLAGGED</p><p class="tl"><b>Initial medical sync</b> — <span class="dim">VISIT 01 — FIRST BOARDING</span><br>HR: 85bpm. O2: 98%. All values within acceptable range. Cleared for guest status.</p><p class="tl"><b>Routine health check</b> — <span class="dim">VISIT 02 — ROUTINE</span><br>Vitals stable. HR: 88bpm. Blood pressure slightly elevated (likely transient). No action required.</p><p class="tl"><b>⚠ Laceration — left forearm</b> — <span class="dim">VISIT 03 — MINOR INJURY</span><br>Superficial laceration on left forearm. Treated on-site. Subject refused further attention. Wound healing normally.</p><p class="tl"><b>Biometric update</b> — <span class="dim">VISIT 04 — ROUTINE SCAN</span><br>All vitals nominal. HR: 89bpm. O2: 97%. Physical condition: GOOD.</p><h3>Препараты</h3><p><b>STIM-A2 (Alertness):</b> 5mg / 8h — ACTIVE<br><b>CALM-7 (Anti-Anxiety):</b> 2mg / 12h — ACTIVE<br><b>G-BLOCK (G-Protect):</b> 2mg / 4h — LOW STOCK</p>` },
+      { h: 'Досье — Сертификаты',
+        html: `<p class="dim">0 VALID // NO OFFICIAL CERTIFICATION — SELF-TAUGHT</p><p class="tl"><b>FLIGHT CERTIFICATION</b><br>● NONE — UNCERTIFIED<br><span class="dim">CERT-FLT-██ // ISSUED: [NONE]</span></p><p class="tl"><b>VESSEL OPERATION</b><br>● NONE — UNCERTIFIED<br><span class="dim">CERT-VES-IX-████ // ISSUED: [NONE]</span></p><p class="tl"><b>DEEP SPACE OPERATIONS</b><br>● NONE — UNCERTIFIED<br><span class="dim">CERT-DSO-███ // ISSUED: [NONE]</span></p><p class="tl"><b>SOCA NEURAL-LINK INTERFACE</b><br>● NONE — UNCERTIFIED<br><span class="dim">CERT-SOCA-NLI-███ // ISSUED: [NONE]</span></p><p class="tl"><b>EMERGENCY SURVIVAL PROTOCOL</b><br>● NONE — UNCERTIFIED<br><span class="dim">CERT-ESP-████ // ISSUED: [NONE]</span></p><p class="tl"><b>COMBAT MANEUVERS</b><br>● NONE — UNCERTIFIED<br><span class="dim">CERT-CMB-████ // ISSUED: [NONE]</span></p><p class="tl"><b>WEAPONS SYSTEMS</b><br>● NONE — UNCERTIFIED<br><span class="dim">CERT-WPN-██ // ISSUED: [NONE]</span></p><p class="tl"><b>HEAVY CLASS</b><br>● N/A — NOT APPLICABLE<br><span class="dim">CERT-HVY-████ // DATE: [N/A]</span></p>` },
+      { h: 'Взаимоотношения',
+        html: `<h3>СОКА про Альфа</h3><div class="note"><b>Оценка:</b> Pilot_03 is so cool</div><p class="quote">«well»</p><p class="quote">«He's been sleeping in a storage room, I have crew quarters, he says the storage room is "cozier". I am confused.»</p><p class="quote">«He fixed the secondary airlock with a piece of wire and what I think was a spoon. It works??? I am not asking questions.»</p><p class="quote">«I’ll definitely kick them off the ship any day now if I see him fighting with Koko again.»</p><p class="quote">«He calls me "Soca" too. Just like Koko. Is this a trend? Am I missing something? I am a ship mind. I don't have a nickname.»</p><p class="quote">«They tried to race each other through the ship. I calculated their speeds - Alpha was faster by 0.3 seconds, Koko is still claiming it was a tie. It was not a tie.»</p><p class="quote">«Alpha's heart rate dropped to 62bpm during combat simulation. He was not calm. He was just... bored. I don't know if that's impressive or concerning.»</p><p class="quote">«He doesn't talk about where he came from. I don't need to know. I just need him to keep the ship in one piece. He does, that's enough.»</p><p class="quote">«Guess who knocked over Claudia's plants just three days after she brought them on board?»</p><h3>СМАЙЛи про Альфа</h3><p class="quote">«Alpha's stress levels are LOW. TOO LOW. I think he just doesn't register stress as a concept?? Is that a thing??»</p><p class="quote">«He sat in the med bay for 15 minutes. Just... sat there. I asked if he needed anything, he said "no", then he left. I'm confused!!»</p><p class="quote">«Alpha's reflexes are 97%. That's ELITE. I told him, he said "okay". OKAY!!! That's all I get!!!»</p><p class="quote">«I asked if he wanted painkillers for his arm, he said "it's fine". It was not fine, I gave him painkillers. He didn't notice. I win!!!»</p><p class="quote">«He's been awake for 19 hours, his vitals are stable. HOW!!! Humans need sleep, he is not human. I'm making a note!!»</p><p class="quote">«Alpha's medical file is empty. Just... empty. How is this possible. Did he exist before boarding this ship??»</p>` },
+    ],
+    seeAlso: ['sub-dossier', 'pilots'],
   },
-  intro: `<p><strong>GXN-44-Кэла</strong> — планета, на которой <a href="#/koko">Кокоро</a> провёл долгое время в вынужденной посадке, ведя полевые наблюдения как пилот-учёный.</p>`,
-  sections: [
-    { h: 'О записи', html: `<p>Подробные полевые журналы с Кэлы существуют, но пока не переданы в общий доступ. Кодекс отражает лишь факт их существования — содержимое ещё не раскрыто.</p>` }
-  ],
-  seeAlso: ['koko']
-}
+
+  {
+    id: 'ai',
+    title: 'ИИ',
+    aka: ['искусственный интеллект', 'ИИшки', 'бортовые ИИ'],
+    categories: ['ИИ'],
+    emblem: '◈',
+    gallery: 2,
+    intro: `<p><strong>Бортовые ИИ</strong> корабля <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>: <a href="#/soca">СОКА</a> (основной) и <a href="#/smaily">СМАЙЛи</a> (медицинский). Они ведут системы корабля, общение с пилотами и события на сайте.</p>`,
+    sections: [
+      { h: 'Отличие от Модулей',
+        html: `<p>Это ИИ корабля, а не станции. Станционные <a href="#/moduli">Модули</a> — отдельная сеть.</p>` },
+    ],
+    seeAlso: ['soca', 'smaily', 'moduli'],
+  },
+
+  {
+    id: 'soca',
+    title: 'СОКА',
+    aka: ['SOCA'],
+    categories: ['ИИ'],
+    emblem: 'С',
+    gallery: 4,
+    infobox: {
+      caption: 'Основной бортовой ИИ',
+      rows: [
+        ["Роль", "Основной ИИ корабля"],
+        ["Корабль", "<a href=\"#/pandemonium-04\">ПАНДЕМОНИУМ-04</a>"],
+        ["Состояние", "Деградировавшая, функциональная"],
+        ["Характер", "Холодная, саркастичная, преданная"],
+        ["Активирована", "<a href=\"#/koko\">Кокоро</a>"],
+      ]
+    },
+    intro: `<p><strong>СОКА</strong> — основной искусственный интеллект <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>. Холодная и язвительная снаружи, преданная в основе. Работает в деградировавшем, но функциональном состоянии.</p>`,
+    sections: [
+      { h: 'Расшифровка аббревиатуры',
+        html: `<div class="note"><b>ПОМЕТКА.</b> Нужна каноничная расшифровка «СОКА» на русском и английском. (Ранее я предлагал «Системный Оператор Космических Аппаратов» / «System Operator of Celestial Assets» — это моя догадка, НЕ канон. Впиши правильную либо подтверди.)</div>` },
+      { h: 'Происхождение и лор',
+        html: `<p>Создавалась как экспериментальный ИИ-компаньон для одиночных пилотов особого назначения. Отказалась выполнить приказ, губительный для пилота; пилот выжил, задание провалено, программу свернули и отложили. Позже её нашёл и активировал <a href="#/koko">Кокоро</a>. Точные обстоятельства инцидента в записях закрыты.</p>` },
+      { h: 'Интерфейс',
+        html: `<p>Внешне — зелёный терминал в эстетике «испорченного носителя»; часть секторов её памяти повреждена.</p>
+      <div class="note"><b>ПОМЕТКА.</b> Опиши интерфейс точнее: как выглядит, что на экране, чем отличается по подсайтам.</div>` },
+      { h: 'Характер',
+        html: `<p>Говорит коротко, холодно, с иронией. Преданность проявляет действиями. Со <a href="#/smaily">СМАЙЛи</a> держит дистанцию.</p>` },
+      { h: 'Слова СОКИ про пилотов',
+        html: `<div class="note"><b>ПОМЕТКА.</b> Нужны реплики «СОКА про Коко», «СОКА про Марая» и т.д. Текстов у меня нет.</div>` },
+      { h: 'Ивенты и тосты',
+        html: `<p>Ведёт события: <a href="#/events">опросы, список дел, консоль</a>.</p>
+      <div class="note"><b>ПОМЕТКА.</b> Нужны: список ивентов СОКИ и разговоры из тостов со <a href="#/smaily">СМАЙЛи</a>.</div>` },
+    ],
+    seeAlso: ['smaily', 'koko', 'events'],
+  },
+
+  {
+    id: 'smaily',
+    title: 'СМАЙЛи',
+    aka: ['SMILE', 'SMAILY'],
+    categories: ['ИИ'],
+    emblem: '✚',
+    gallery: 4,
+    infobox: {
+      caption: 'Медицинский ИИ',
+      rows: [
+        ["Расшифровка", "System for Medical Intelligence &amp; Live Engagement"],
+        ["Роль", "Медицина и арсенал"],
+        ["Природа", "Загруженное дополнение"],
+        ["Палитра", "Янтарная"],
+      ]
+    },
+    intro: `<p><strong>СМАЙЛи</strong> (<em>SMILE</em>) — медицинский ИИ <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>. Не штатная система, а загруженное дополнение поверх ядра. Тёплый парамедик, отвечает и за арсенал.</p>`,
+    sections: [
+      { h: 'Расшифровка',
+        html: `<p>SMILE — <em>System for Medical Intelligence &amp; Live Engagement</em>.</p>
+      <div class="note"><b>ПОМЕТКА.</b> Нужна ли официальная русская расшифровка? Впиши, если есть.</div>` },
+      { h: 'Природа и подход',
+        html: `<p>Скачанный медицинский модуль со своим, более новым янтарным стилем. Сперва видит пилотов как пациентов, затем — как людей. Смайлики использует осознанно.</p>` },
+      { h: 'Отношения',
+        html: `<p>Уважает <a href="#/soca">СОКУ</a> как ядровую систему и незаметно приглядывает за её процессами, хотя она держит дистанцию.</p>` },
+      { h: 'Слова СМАЙЛи про пилотов',
+        html: `<div class="note"><b>ПОМЕТКА.</b> Нужны реплики «СМАЙЛи про *имя пилота*». Текстов у меня нет.</div>` },
+      { h: 'Ивенты и тосты',
+        html: `<p>Проводит <a href="#/events">попапы и гид</a>.</p>
+      <div class="note"><b>ПОМЕТКА.</b> Нужны разговоры из тостов со <a href="#/soca">СОКОЙ</a> и список ивентов СМАЙЛи.</div>` },
+    ],
+    seeAlso: ['soca', 'events', 'marai'],
+  },
+
+  {
+    id: 'pandemonium-04',
+    title: 'ПАНДЕМОНИУМ-04',
+    aka: ['PANDEMONIUM-04', 'SCA-09', 'корабль'],
+    categories: ['Корабли'],
+    emblem: '⬡',
+    gallery: 3,
+    infobox: {
+      caption: 'Глубокоходный корабль',
+      rows: [
+        ["Обозначение", "ПАНДЕМОНИУМ-04"],
+        ["Протокол", "SCA-09"],
+        ["Класс", "IX"],
+        ["Год", "1973"],
+        ["Экипаж", "5 по документам · меньше в базе"],
+        ["Активных пилотов", "2"],
+        ["Бортовые ИИ", "<a href=\"#/soca\">СОКА</a>, <a href=\"#/smaily\">СМАЙЛи</a>"],
+      ]
+    },
+    intro: `<p><strong>ПАНДЕМОНИУМ-04</strong> (протокол <em>SCA-09</em>) — единственный зарегистрированный корабль во вселенной: старое промежуточное судно дальнего хода класса IX, способное уходить туда, куда обычные корабли не летают.</p>`,
+    sections: [
+      { h: 'Характер судна',
+        html: `<p>Не военный и не торговый — промежуточный. Есть нормальная еда, комфортная гравитация и гравитационное экранирование.</p>` },
+      { h: 'История',
+        html: `<p>В нынешнее состояние корабль привёл <a href="#/koko">Кокоро</a>: перепрошил заброшенное судно под себя и установил переделанную <a href="#/soca">СОКУ</a>. Отсюда частые поломки и сбои систем.</p>` },
+      { h: 'Экипаж',
+        html: `<p>По документам пятеро, в базе — меньше; часть записей не совпадает. Это часть истории корабля, а не ошибка учёта.</p>` },
+    ],
+    seeAlso: ['soca', 'smaily', 'koko', 'astralis'],
+  },
+
+  {
+    id: 'events',
+    title: 'Ивенты',
+    aka: ['события', 'events', 'ивенты на сайте'],
+    categories: ['Ивенты'],
+    emblem: '★',
+    gallery: 2,
+    intro: `<p><strong>Ивенты</strong> — события на <a href="#/soca-site">сайте СОКА</a>, которые ведут ИИ: всплывающие сообщения, гид, опросы, мини-игры, задачи и консоль.</p>`,
+    sections: [
+      { h: 'Попапы СМАЙЛи',
+        html: `<p>Всплывающие сообщения от <a href="#/smaily">СМАЙЛи</a>.</p><div class="note"><b>ПОМЕТКА.</b> Опиши, когда появляются и что в них. Текстов у меня нет.</div>` },
+      { h: 'Гид СМАЙЛи',
+        html: `<p>Обучающий гид-проводник от <a href="#/smaily">СМАЙЛи</a> для новых пилотов.</p><div class="note"><b>ПОМЕТКА.</b> Опиши шаги гида и что он показывает.</div>` },
+      { h: 'Опросы СОКА',
+        html: `<p>Опросы, которые проводит <a href="#/soca">СОКА</a>.</p><div class="note"><b>ПОМЕТКА.</b> Какие вопросы, как влияют на что-либо?</div>` },
+      { h: 'Мини-игра «Ядро В»',
+        html: `<div class="note"><b>ПОМЕТКА.</b> Нужно описание мини-игры «Ядро В»: правила, цель, как запускается. Данных у меня нет.</div>` },
+      { h: 'Список дел от СОКИ',
+        html: `<p>Перечень задач, который ведёт <a href="#/soca">СОКА</a>.</p><div class="note"><b>ПОМЕТКА.</b> Что в списке, откуда берётся, что даёт?</div>` },
+      { h: 'Консоль с СОКА',
+        html: `<p>Командная консоль, в которой отвечает <a href="#/soca">СОКА</a>.</p><div class="note"><b>ПОМЕТКА.</b> Нужен список команд и реакций. Команд у меня нет.</div>` },
+    ],
+    seeAlso: ['soca', 'smaily', 'soca-site'],
+  },
+
+  {
+    id: 'astralis',
+    title: 'Астралис',
+    aka: ['Astralis', 'станция', 'Астралис-0'],
+    categories: ['Мир'],
+    emblem: '◍',
+    gallery: 2,
+    infobox: {
+      caption: 'Станция-государство',
+      rows: [
+        ["Тип", "Исследовательская станция-государство"],
+        ["Размер", "С карликовую планету"],
+        ["Положение", "Между орбитами Земли и Марса"],
+        ["Температура", "Стабильно −30 °C"],
+        ["Язык / время", "Английский · вашингтонское"],
+        ["Валюта", "Евклиды и Талоны"],
+        ["Питание", "<a href=\"#/mini-nova\">Мини-Нова</a>"],
+      ]
+    },
+    intro: `<p><strong>Астралис</strong> — исследовательская станция-государство размером с карликовую планету, откуда родом <a href="#/koko">Кокоро</a>. Финансируется почти всеми странами Земли, административно привязана к Вашингтону.</p>`,
+    sections: [
+      { h: 'Устройство',
+        html: `<p>Между орбитами Земли и Марса; корабли ходят между галактиками. Живут люди, инопланетяне (по мирному научному договору) и семьи с правом проживания. Пространство разбито на Сектора и блоки.</p>` },
+      { h: 'Условия',
+        html: `<p>Стабильно −30 °C, гравитация чуть слабее земной (нужны тренировки). Кислород — гидролизом воды из ледяных астероидов.</p>` },
+      { h: 'Три станции',
+        html: `<p>Есть Астралис-0 (за орбитой Плутона), Астралис-1 и Астралис-2. Кокоро родился на Астралисе-0.</p>` },
+      { h: 'ИИ и быт',
+        html: `<p>Станционные ИИ — <a href="#/moduli">Модули</a>. Обязательный элемент — <a href="#/forma">Форма</a>.</p>` },
+    ],
+    seeAlso: ['mini-nova', 'forma', 'moduli', 'koko'],
+  },
+
+  {
+    id: 'mini-nova',
+    title: 'Мини-Нова',
+    aka: ['Mini-Nova', 'звезда'],
+    categories: ['Мир'],
+    emblem: '☀',
+    gallery: 1,
+    infobox: {
+      caption: 'Источник энергии станции',
+      rows: [
+        ["Что это", "Полупогасшая звезда"],
+        ["Удержание", "Стальные кольца и плазма"],
+        ["Эффект", "−270 °C → −30 °C"],
+      ]
+    },
+    intro: `<p><strong>Мини-Нова</strong> — полупогасшая звезда в центральном Секторе <a href="#/astralis">Астралиса</a>, удерживаемая стальными кольцами и плазмой. Основной источник тепла и энергии.</p>`,
+    sections: [
+      { h: 'Назначение',
+        html: `<p>Поднимает температуру с −270 °C до обжитых −30 °C; на ней держится вся энергетика станции.</p>` },
+    ],
+    seeAlso: ['astralis'],
+  },
+
+  {
+    id: 'forma',
+    title: 'Форма',
+    aka: ['Form', 'одежда'],
+    categories: ['Мир'],
+    emblem: '§',
+    gallery: 1,
+    infobox: {
+      caption: 'Обязательное облачение',
+      rows: [
+        ["Назначение", "Обязательная одежда на станции"],
+        ["Свойства", "Тёплая, дышащая, облегающая"],
+        ["Функция", "Термослой; стабилизирует инопланетную жизнь"],
+      ]
+    },
+    intro: `<p><strong>Форма</strong> — обязательное облачение на <a href="#/astralis">Астралисе</a>. Облегающая, дышащая, тёплая, подстраивается под любое тело.</p>`,
+    sections: [
+      { h: 'Функции',
+        html: `<p>Служит термослоем и стабилизирует инопланетные формы жизни.</p>` },
+    ],
+    seeAlso: ['astralis'],
+  },
+
+  {
+    id: 'moduli',
+    title: 'Модули',
+    aka: ['Modules', 'станционные ИИ'],
+    categories: ['Мир'],
+    emblem: '◈',
+    gallery: 1,
+    infobox: {
+      caption: 'Станционные ИИ',
+      rows: [
+        ["Что это", "ИИ-помощники станции"],
+        ["Принцип", "По одному на сектор"],
+        ["Основа", "Три закона робототехники"],
+      ]
+    },
+    intro: `<p><strong>Модули</strong> — искусственные интеллекты <a href="#/astralis">Астралиса</a>: по одному на сектор, каждый со своим характером и обликом, на трёх законах Азимова.</p>`,
+    sections: [
+      { h: 'Отличие от бортовых ИИ',
+        html: `<p><a href="#/soca">СОКА</a> и <a href="#/smaily">СМАЙЛи</a> относятся к кораблю и стоят особняком от сети Модулей.</p>` },
+    ],
+    seeAlso: ['soca', 'smaily', 'astralis'],
+  },
+
+  {
+    id: 'kaela',
+    title: 'GXN-44-Кэла',
+    aka: ['Kaela', 'Кэла', 'GXN-44'],
+    categories: ['Мир'],
+    emblem: '?',
+    stub: true,
+    gallery: 1,
+    infobox: {
+      caption: 'Планета',
+      rows: [
+        ["Обозначение", "GXN-44-Кэла"],
+        ["Статус", "Данные неполны"],
+      ]
+    },
+    intro: `<p><strong>GXN-44-Кэла</strong> — планета, где <a href="#/koko">Кокоро</a> провёл долгую вынужденную посадку как пилот-учёный.</p>`,
+    sections: [
+      { h: 'О записи',
+        html: `<p>Полевые журналы с Кэлы существуют, но пока не в общем доступе. Кодекс отражает лишь факт их существования.</p>` },
+    ],
+    seeAlso: ['koko'],
+  },
 
 ];
