@@ -6,7 +6,6 @@
    Чёрные заголовки/скроллбар с белым поверх; окна белые и нежно-зелёные.
    ========================================================================== */
 
-   
 :root {
   --desk:    #6f8a66;   /* тёмная зелень рабочего стола */
   --desk-2:  #66805d;   /* дизеринг */
@@ -295,6 +294,25 @@ body {
 .backlinks ul { list-style: none; padding: 0; margin: .45em 0 0; font-size: 16px; }
 .backlinks li { margin: 3px 0; }
 .backlinks li::before { content: '< '; }
+
+/* заглавная (стартовое окно) */
+.home-mast { border-bottom: var(--bw) solid var(--ink); padding-bottom: 12px; margin-bottom: 12px; }
+.home-title { font-family: var(--font-ui); font-size: 22px; line-height: 1.1; }
+.home-sub { font-family: var(--font-ui); font-size: 12px; color: var(--mut); margin-top: 4px; }
+.home-feat { display: flex; gap: 12px; align-items: center; border: var(--bw) solid var(--ink); background: var(--white); padding: 12px; margin: .3em 0 .7em; text-decoration: none !important; }
+.home-feat:hover { background: var(--ink); }
+.home-feat:hover .hf-t, .home-feat:hover .hf-d { color: var(--wtx); }
+.hf-em { width: 46px; height: 46px; flex: 0 0 46px; display: grid; place-items: center; background: var(--ink); color: var(--wtx); font-family: var(--font-body); font-size: 24px; }
+.home-feat:hover .hf-em { background: var(--wtx); color: var(--ink); }
+.hf-tx { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.hf-t { font-family: var(--font-ui); font-size: 16px; }
+.hf-d { font-size: 15px; color: var(--mut); }
+.home-cats { display: flex; flex-wrap: wrap; gap: 8px; margin: .3em 0 .6em; }
+.home-cat { display: inline-flex; align-items: center; gap: 8px; border: var(--bw) solid var(--ink); background: var(--white); padding: 7px 12px; font-family: var(--font-ui); font-size: 13px; text-decoration: none !important; }
+.home-cat:hover { background: var(--ink); color: var(--wtx); }
+.hc-n { font-size: 11px; opacity: .7; }
+.home-upd { list-style: none; padding: 0; margin: .3em 0; font-size: 16px; }
+.home-upd li { padding: 5px 0; border-bottom: var(--bw) dotted var(--ink); }
 
 /* ---- ПОИСК --------------------------------------------------------------- */
 .search-box { padding: 10px; border-bottom: var(--bw) solid var(--ink); display: flex; gap: 8px; align-items: center; font-family: var(--font-ui); font-size: 15px; }

@@ -32,7 +32,8 @@
     note:   '<svg viewBox="0 0 20 18" fill="none" stroke="currentColor" stroke-width="1.4" shape-rendering="crispEdges"><rect x="3" y="1" width="14" height="16"/><line x1="6" y1="5" x2="14" y2="5"/><line x1="6" y1="8" x2="14" y2="8"/><line x1="6" y1="11" x2="14" y2="11"/><line x1="6" y1="14" x2="11" y2="14"/></svg>',
     trash:  '<svg viewBox="0 0 20 18" fill="none" stroke="currentColor" stroke-width="1.4" shape-rendering="crispEdges"><path d="M4 4h12l-1 13H5z"/><line x1="2" y1="4" x2="18" y2="4"/><path d="M8 4V2h4v2"/><line x1="8" y1="7" x2="8" y2="14"/><line x1="12" y1="7" x2="12" y2="14"/></svg>',
     image:  '<svg viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="1.6" shape-rendering="crispEdges"><rect x="2" y="2" width="20" height="16"/><circle cx="8" cy="7" r="2"/><path d="M3 17l6-6 4 4 3-3 5 5"/></svg>',
-    lock:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" shape-rendering="crispEdges"><rect x="4" y="10" width="16" height="12"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/><rect x="11" y="14" width="2" height="4"/></svg>'
+    lock:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" shape-rendering="crispEdges"><rect x="4" y="10" width="16" height="12"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/><rect x="11" y="14" width="2" height="4"/></svg>',
+    home:   '<svg viewBox="0 0 20 18" fill="none" stroke="currentColor" stroke-width="1.4" shape-rendering="crispEdges"><path d="M2 9l8-6 8 6"/><path d="M4 8v9h12V8"/><rect x="8" y="11" width="4" height="6"/></svg>'
   };
 
   /* ---- элементы каркаса ------------------------------------------------ */
@@ -92,6 +93,7 @@
   /* ---- рабочий стол ---------------------------------------------------- */
   function buildDesktop() {
     var items = [];
+    items.push({ ic: 'home', label: 'ЗАГЛАВНАЯ', act: openHome });
     categories().forEach(function (c) {
       items.push({ ic: 'disk', label: c.name.toUpperCase(), act: function () { openFolder(c.name); } });
     });
@@ -402,7 +404,47 @@
       }
     });
     return w;
-    
+  }
+
+  /* ---- ЗАГЛАВНАЯ (стартовое окно) ------------------------------------- */
+  function firstSentence(html) {
+    var t = stripHtml(html); var m = t.match(/^.*?[.!?](\s|$)/);
+    var s = m ? m[0].trim() : t;
+    return s.length > 160 ? s.slice(0, 160) + '…' : s;
+  }
+  var FEATURED_POOL = ['koko', 'marai', 'soca', 'smaily', 'pandemonium-04', 'claudia', 'alpha'];
+  function openHome() {
+    var pool = FEATURED_POOL.filter(function (id) { return BY_ID[id]; });
+    var f = BY_ID[pool[Math.floor(Math.random() * pool.length)]];
+    var body = '<div class="article home">' +
+      '<div class="home-mast"><div class="home-title">КОДЕКС ПАНДЕМОНИУМ</div>' +
+      '<div class="home-sub">энциклопедия вселенной ПАНДЕМОНИУМ-04</div></div>' +
+      '<div class="a-body">' +
+      '<p>Добро пожаловать. Открывайте папки-диски на рабочем столе, ищите через «Поиск» или прыгайте в любую статью через меню «Переход».</p>';
+
+    body += '<h2>Избранная статья</h2>' +
+      '<a class="home-feat" href="#/' + f.id + '"><span class="hf-em">' + (f.emblem || '◍') + '</span>' +
+      '<span class="hf-tx"><span class="hf-t">' + f.title + '</span>' +
+      '<span class="hf-d">' + firstSentence(f.intro) + '</span></span></a>';
+
+    body += '<h2>Разделы</h2><div class="home-cats">';
+    categories().forEach(function (c) {
+      body += '<a class="home-cat" href="#/cat/' + encodeURIComponent(c.name) + '">' + c.name +
+        '<span class="hc-n">' + c.count + '</span></a>';
+    });
+    body += '</div>';
+
+    body += '<h2>Обновления</h2>';
+    var U = window.WIKI_UPDATES || [];
+    if (U.length) {
+      body += '<ul class="home-upd">' + U.slice(0, 6).map(function (u) {
+        return '<li><b>' + escapeHtml(u.date || '') + '</b> — ' + escapeHtml(u.text || '') + '</li>';
+      }).join('') + '</ul>';
+    } else {
+      body += '<div class="note"><b>ПОМЕТКА.</b> Впиши журнал в массив <b>WIKI_UPDATES</b> в начале articles.js — формат {date, text}. Пока пусто.</div>';
+    }
+    body += '</div></div>';
+    makeWindow({ key: 'home', name: 'ЗАГЛАВНАЯ', sub: '', bodyHtml: body, w: 600, kind: 'art' });
   }
 
   /* ---- О Кодексе ------------------------------------------------------- */
@@ -411,9 +453,9 @@
       '<div class="a-title" style="font-family:var(--font-ui);font-size:15px">КОДЕКС ПАНДЕМОНИУМ</div>' +
       '<p>Авторская энциклопедия вселенной <a href="#/pandemonium-04">ПАНДЕМОНИУМ-04</a>. ' +
       'Здесь собрано то, что известно с основного сайта: персонажи, корабль, доступные секретки, устройство мира.</p>' +
-      '<p>Открывайте папки-диски на рабочем столе или ищите через "ПОИСК". ' +
-      'Часть мира намеренно оставлена в недосказанной - Кодекс объясняет устройство, но не раскрывает загадки.</p>' +
-      '<p><em>Клик по иконке или файлу открывает окно. Крестик слева - закрыть. Меню "Переход" - прыгнуть в любую статью.</em></p>' +
+      '<p>Открывайте папки-диски на рабочем столе или ищите через «ПОИСК». ' +
+      'Часть мира намеренно оставлена недосказанной — Кодекс объясняет устройство, но не раскрывает загадки.</p>' +
+      '<p><em>Клик по иконке или файлу открывает окно. Крестик слева — закрыть. Меню «Переход» — прыгнуть в любую статью.</em></p>' +
       '</div></div>';
     makeWindow({ key: 'readme', name: 'О КОДЕКСЕ', sub: '', bodyHtml: body, w: 420 });
   }
@@ -489,6 +531,7 @@
 
     var menus = [
       { title: 'Файл', rows: [
+        { label: 'На заглавную', act: openHome },
         { label: 'Найти…', act: function () { openSearch(''); } },
         { label: 'О Кодексе', act: openReadme },
         { sep: true },
@@ -528,6 +571,8 @@
     document.addEventListener('click', closeMenus);
     var tb = document.getElementById('theme-btn');
     if (tb) tb.addEventListener('click', function (e) { e.stopPropagation(); closeMenus(); toggleTheme(); });
+    var brand = elMenubar.querySelector('.mb-brand');
+    if (brand) { brand.style.cursor = 'pointer'; brand.addEventListener('click', function (e) { e.stopPropagation(); closeMenus(); openHome(); }); }
   }
   function closeMenus() { elMenubar.querySelectorAll('.mb-item.open').forEach(function (i) { i.classList.remove('open'); }); }
 
@@ -549,8 +594,8 @@
   applyTheme(savedTheme);
   tick(); setInterval(tick, 15000);
 
-  // приветственное окно при первом заходе
-  openReadme();
+  // стартовое окно при заходе
+  openHome();
 
   // публичный хук для отладки
   window.OS = { openArticle: openArticle, openFolder: openFolder, openSearch: openSearch };
